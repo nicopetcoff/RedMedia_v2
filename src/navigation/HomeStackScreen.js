@@ -1,9 +1,10 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity } from 'react-native';
 import HomeScreen from '../screens/HomeScreen';
 import PostDetail from '../screens/PostDetail';
 import ProfileScreen from '../screens/ProfileScreen'; // Pantalla de perfil
+import BackIcon from '../assets/imgs/back.svg'; // Icono personalizado
 
 const Stack = createStackNavigator();
 
@@ -23,8 +24,9 @@ const HomeStackScreen = ({ navigation }) => {
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              style={{ marginLeft: 10 }}>
-              <Text style={{ fontSize: 24 }}>←</Text> 
+              style={{ marginLeft: 10 }}
+            >
+              <BackIcon width={24} height={24} /> 
             </TouchableOpacity>
           ),
         }}
@@ -37,8 +39,9 @@ const HomeStackScreen = ({ navigation }) => {
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              style={{ marginLeft: 10 }}>
-              <Text style={{ fontSize: 24 }}>←</Text> 
+              style={{ marginLeft: 10 }}
+            >
+              <BackIcon width={24} height={24} /> 
             </TouchableOpacity>
           ),
         }}

@@ -1,38 +1,31 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
+
+import HomeIcon from '../assets/imgs/home.svg';
+import SearchIcon from '../assets/imgs/search.svg';
+import CreatePostIcon from '../assets/imgs/add_circle.svg';
+import NotificationIcon from '../assets/imgs/heart.svg';
+import ProfileIcon from '../assets/imgs/profile.svg';
+
 import HomeStackScreen from './HomeStackScreen';
 import SearchScreen from '../screens/SearchScreen';
 import ImagePickerScreen from '../screens/ImagePickerScreen';
-import NotificationStackScreen from './NotificationStackScreen';
+import NotificationStackScreen from '../screens/NotificationScreen';
 import LoggedInUserProfileScreen from '../screens/LoggedInUserProfileScreen';
 
 const Tab = createBottomTabNavigator();
 
-const TabBarIcon = ({ route, color, size }) => {
-  // Iconos de marcador de posición
-  let iconName;
-  switch (route.name) {
-    case 'HomeStack':
-      iconName = '🏠';
-      break;
-    case 'Search':
-      iconName = '🔍';
-      break;
-    case 'CreatePost':
-      iconName = '➕';
-      break;
-    case 'Notifications':
-      iconName = '❤️';
-      break;
-    case 'Profile':
-      iconName = '👤';
-      break;
-    default:
-      iconName = '';
-      break;
-  }
-  return <Text style={{ fontSize: size, color }}>{iconName}</Text>;
+const TabBarIcon = ({ route, size }) => {
+  const icons = {
+    HomeStack: HomeIcon,
+    Search: SearchIcon,
+    CreatePost: CreatePostIcon,
+    Notifications: NotificationIcon,
+    Profile: ProfileIcon,
+  };
+
+  const IconComponent = icons[route.name];
+  return <IconComponent width={size} height={size} />;
 };
 
 const BottomTabNavigator = () => {
