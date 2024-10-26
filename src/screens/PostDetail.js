@@ -4,6 +4,7 @@ import PostHeader from '../components/PostHeader';
 import PostImage from '../components/PostImage';
 import PostInteractionBar from '../components/PostInteractionBar';
 import PostComments from '../components/PostComments';
+import LocationIcon from '../assets/imgs/location.svg';
 
 const PostDetail = ({ route, navigation }) => {
   const { item } = route.params || {};
@@ -33,14 +34,14 @@ const PostDetail = ({ route, navigation }) => {
           setIsFollowing={setIsFollowing}
         />
       </TouchableOpacity>
-
+      
       <View style={styles.titleContainer}>
         {item.title && <Text style={styles.title}>{item.title}</Text>}
       </View>
       <PostImage images={item.image} />
       {item.location && (
         <View style={styles.locationContainer}>
-          <Text style={styles.icon}>📍</Text> 
+          <LocationIcon width={16} height={16} />
           <Text style={styles.location}>{item.location}</Text>
         </View>
       )}
@@ -76,10 +77,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     marginTop: 10,
-  },
-  icon: {
-    fontSize: 16, // Ajusta el tamaño del icono de texto
-    marginRight: 5,
   },
   location: {
     fontSize: 12,

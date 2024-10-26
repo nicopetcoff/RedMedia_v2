@@ -1,5 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import LikeIcon from '../assets/imgs/like.svg';
+import FilledLikeIcon from '../assets/imgs/filled_like.svg';
+import CommentIcon from '../assets/imgs/comentar.svg';
+import InterestIcon from '../assets/imgs/intereses.svg';
 
 const PostInteractionBar = ({ isLiked, setIsLiked }) => {
   return (
@@ -7,18 +11,22 @@ const PostInteractionBar = ({ isLiked, setIsLiked }) => {
       <View style={styles.leftIcons}>
         {/* Botón de like */}
         <TouchableOpacity onPress={() => setIsLiked(!isLiked)} style={styles.iconButton}>
-          <Text style={styles.icon}>{isLiked ? '❤️' : '🤍'}</Text>
+          {isLiked ? (
+            <FilledLikeIcon width={24} height={24} />
+          ) : (
+            <LikeIcon width={24} height={24} />
+          )}
         </TouchableOpacity>
 
         {/* Botón de comentar */}
         <TouchableOpacity onPress={() => console.log('Comentar presionado')} style={styles.iconButton}>
-          <Text style={styles.icon}>💬</Text>
+          <CommentIcon width={24} height={24} />
         </TouchableOpacity>
       </View>
 
       {/* Botón de intereses */}
-      <TouchableOpacity onPress={() => console.log('Intereses presionado')} style={styles.iconButton}>
-        <Text style={styles.icon}>⭐️</Text>
+      <TouchableOpacity onPress={() => console.log('Intereses presionado')}>
+        <InterestIcon width={24} height={24} />
       </TouchableOpacity>
     </View>
   );
@@ -37,9 +45,6 @@ const styles = StyleSheet.create({
   },
   iconButton: {
     marginHorizontal: 10, // Agrega un espacio horizontal entre los íconos
-  },
-  icon: {
-    fontSize: 24,
   },
 });
 
