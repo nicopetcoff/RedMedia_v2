@@ -56,43 +56,52 @@ export const signUp = async (userData) => {
   }
 };
 
+// Función que crea una promesa que se rechaza tras un tiempo definido
+const timeout = (ms) => {
+  return new Promise((_, reject) =>
+    setTimeout(() => reject(new Error("Tiempo de espera agotado. Intenta más tarde.")), ms)
+  );
+};
+
 export const signIn = async (userData) => {
-  const url = urlWebServices.signIn;  // URL del endpoint
+  const url = urlWebServices.signIn; // URL del endpoint
 
   try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-      body: JSON.stringify({
-        email: userData.email,
-        password: userData.password,
+    // Usamos Promise.race para establecer el timeout
+    const response = await Promise.race([
+      fetch(url, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          email: userData.email,
+          password: userData.password,
+        }),
       }),
-    });
+      timeout(3000), // Timeout de 3 segundos
+    ]);
 
     const data = await response.json();
 
     if (!response.ok) {
-      // Si la respuesta no es exitosa, lanzamos un error con el mensaje del backend
       const errorMessage = data.message || `Error ${response.status}: Error en el login.`;
       const error = new Error(errorMessage);
-      error.status = response.status; // Adjuntamos el estado HTTP al error
+      error.status = response.status;
       throw error;
     }
 
-    return { status: response.status, data };  // Retornamos datos y estado
-
+    return { status: response.status, data };
   } catch (error) {
     console.error("Error en signIn API:", error.message);
-    // Si el error es de red o no hay respuesta del servidor
     if (!error.status) {
-      throw new Error("No se pudo conectar con el servidor. Inténtalo más tarde.");
+      throw new Error("No se pudo conectar con el servidor.");
     }
-    throw error; // Lanzamos el error para que el frontend lo maneje
+    throw error;
   }
 };
+
 
 // Función nueva añadida
 export const sendPasswordResetEmail = async (email) => {
