@@ -1,20 +1,29 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+// App.js
+import React, { useState, useEffect } from 'react';
+import { Provider } from 'react-redux';
+import store from './src/redux/store';
+import SplashScreen from './src/screens/SplashScreen'; // Importamos el SplashScreen
+import AppNavigator from './src/navigation/AppNavigator'; // Importamos la nueva navegación
 
-export default function App() {
+const App = () => {
+  const [isShowSplashScreen, setIsShowSplashScreen] = useState(true);
+
+  useEffect(() => {
+    
+    setTimeout(() => {
+      setIsShowSplashScreen(false);
+    }, 2000);
+  }, []);
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Provider store={store}>
+      {isShowSplashScreen ? (
+        <SplashScreen />
+      ) : (
+        <AppNavigator />
+      )}
+    </Provider>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
