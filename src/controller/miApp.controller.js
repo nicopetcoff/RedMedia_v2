@@ -57,14 +57,14 @@ export const signUp = async (userData) => {
 };
 
 export const signIn = async (userData) => {
-  let url = urlWebServices.signIn;  // URL para el endpoint de inicio de sesión
+  const url = urlWebServices.signIn;  // URL del endpoint
 
   try {
-    let response = await fetch(url, {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
         email: userData.email,
@@ -72,16 +72,25 @@ export const signIn = async (userData) => {
       }),
     });
 
+    const data = await response.json();
+
     if (!response.ok) {
-      throw new Error("Error al iniciar sesión: " + response.status);
+      // Si la respuesta no es exitosa, lanzamos un error con el mensaje del backend
+      const errorMessage = data.message || `Error ${response.status}: Error en el login.`;
+      const error = new Error(errorMessage);
+      error.status = response.status; // Adjuntamos el estado HTTP al error
+      throw error;
     }
 
-    let data = await response.json();
-    return data;
+    return { status: response.status, data };  // Retornamos datos y estado
 
   } catch (error) {
-    console.error("Error:", error);
-    throw error;
+    console.error("Error en signIn API:", error.message);
+    // Si el error es de red o no hay respuesta del servidor
+    if (!error.status) {
+      throw new Error("No se pudo conectar con el servidor. Inténtalo más tarde.");
+    }
+    throw error; // Lanzamos el error para que el frontend lo maneje
   }
 };
 

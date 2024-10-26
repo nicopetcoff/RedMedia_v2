@@ -19,27 +19,28 @@ const SignInScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const handleSignIn = async () => {
-    try {
-      const userData = { email, password };
-      const response = await signInAPI(userData);
+  try {
+    const userData = { email, password };
+    const { status, data } = await signInAPI(userData);
 
-      if (response.token) {
-        
-        await AsyncStorage.setItem('userToken', response.token);
-        
-        
-        dispatch(signIn({ user: response.user, token: response.token }));
+    if (status === 200) {
+      const { token, user } = data;
 
-        
-        navigation.replace('MainApp');
-      } else {
-        Alert.alert('Error', 'Login failed, please try again.');
-      }
-    } catch (error) {
-      console.error('Error during login:', error);
-      Alert.alert('Error', 'Something went wrong during login.');
-    }
-  };
+      // Guardar token en AsyncStorage
+      await AsyncStorage.setItem('userToken', token);
+
+      // Actualizar estado global con Redux
+      dispatch(signIn({ user, token }));
+
+      // Navegar a la pantalla principal
+      navigation.replace('MainApp');
+    } 
+  } catch (error) {
+    // Mostrar el mensaje de error recibido del backend o un mensaje genérico
+    Alert.alert('Error', error.message);
+  }
+};
+
 
   const handleForgotPassword = () => {
     navigation.navigate('ForgotPassword'); 
