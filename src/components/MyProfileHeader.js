@@ -8,9 +8,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import MyData from '../data/MyData.json'; // Importamos el archivo JSON con los datos del usuario
+import { useNavigation } from '@react-navigation/native';
+
+
 
 const MyProfileHeader = () => {
   const {width: windowWidth} = Dimensions.get('window'); // Obtener el ancho de la ventana
+
+  const navigation = useNavigation();
 
   // Verificación explícita de que los valores followers y following existen y son números válidos
   const followersCount =
@@ -19,7 +24,7 @@ const MyProfileHeader = () => {
     typeof MyData.following === 'number' ? MyData.following : 0;
 
     const handleEditPress = () => {
-      console.log('Editar');
+      navigation.navigate('EditProfile');
     };
   
     const handleSavedPress = () => {

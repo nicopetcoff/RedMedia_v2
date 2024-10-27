@@ -1,8 +1,9 @@
 // src/screens/NotificationScreen.js
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
+import {View, Text, FlatList, StyleSheet,TouchableOpacity} from 'react-native';
 import Notification from '../components/Notification';
 import notificaciones from '../data/notificaciones.json';
+import BackIcon from '../assets/imgs/back.svg'; // Icono personalizado de regreso
 import { useNavigation } from '@react-navigation/native';
 
 const NotificationScreen = () => {
@@ -10,16 +11,17 @@ const NotificationScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.icon}>
-          <Text style={styles.backIcon}> ← </Text> 
-          
+        <TouchableOpacity
+          onPress={() =>navigation.goBack()}
+          style={styles.icon}>
+          <BackIcon />
         </TouchableOpacity>
         <Text style={styles.title}>Activity</Text>
       </View>
       <FlatList
         data={notificaciones}
-        renderItem={({ item }) => <Notification item={item} />}
-        keyExtractor={(item) => item.id}
+        renderItem={({item}) => <Notification item={item} />}
+        keyExtractor={item => item.id}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         showsVerticalScrollIndicator={false}
       />
@@ -36,16 +38,11 @@ const styles = StyleSheet.create({
   headerContainer: {
     height: 100,
     backgroundColor: '#fcfcfc',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   icon: {
+    width: 24,
+    height: 24,
     marginTop: 20,
-    padding: 10,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: 'black',
   },
   title: {
     fontSize: 26,
@@ -54,6 +51,7 @@ const styles = StyleSheet.create({
     color: 'black',
     flex: 1,
     textAlign: 'center',
+    alignSelf: 'center',
   },
   separator: {
     height: 1,
