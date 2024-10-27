@@ -1,19 +1,19 @@
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { TouchableOpacity } from 'react-native';
+import {createStackNavigator} from '@react-navigation/stack';
+import {TouchableOpacity} from 'react-native';
 import ProfileScreen from '../screens/ProfileScreen';
+import BackIcon from '../assets/imgs/back.svg';
 import NotificationScreen from '../screens/NotificationScreen';
-import BackIcon from '../assets/imgs/back.svg'; // Importación de SVG como componente
 
 const Stack = createStackNavigator();
 
-const NotificationStackScreen = ({ navigation }) => {
+const NotificationStackScreen = ({navigation}) => {
   return (
     <Stack.Navigator>
       <Stack.Screen
         name="Activity"
         component={NotificationScreen}
-        options={{ headerShown: false }}
+        options={{headerShown: false}}
       />
       <Stack.Screen
         name="StackProfile"
@@ -23,8 +23,7 @@ const NotificationStackScreen = ({ navigation }) => {
           headerLeft: () => (
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              style={{ marginLeft: 10 }}
-            >
+              style={{marginLeft: 10}}>
               <BackIcon width={24} height={24} />
             </TouchableOpacity>
           ),
