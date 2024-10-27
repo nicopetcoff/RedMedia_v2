@@ -1,13 +1,22 @@
 // EditProfileScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Button, Switch } from 'react-native';
+import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useDispatch } from 'react-redux';
+import { signOut } from '../redux/authSlice';
 
 const EditProfileScreen = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [gender, setGender] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('userToken');
+    dispatch(signOut());
+  };
 
   return (
     <View style={styles.container}>
@@ -71,7 +80,7 @@ const EditProfileScreen = ({ navigation }) => {
             <Text style={styles.darkText}>Dark</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.logoutButton}>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <Text style={styles.logoutText}>Logout</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.deleteButton}>

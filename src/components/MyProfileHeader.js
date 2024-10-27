@@ -1,62 +1,58 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Image,
   Dimensions,
   TouchableOpacity,
+  Image, // Importamos el componente Image de React Native
 } from 'react-native';
 import MyData from '../data/MyData.json'; // Importamos el archivo JSON con los datos del usuario
 import { useNavigation } from '@react-navigation/native';
 
-
+// Importa las imágenes por defecto
+import defaultAvatar from '../assets/imgs/avatar.svg'; // Imagen por defecto para avatar
+import defaultCover from '../assets/imgs/cover_image.svg'; // Imagen por defecto para portada
 
 const MyProfileHeader = () => {
-  const {width: windowWidth} = Dimensions.get('window'); // Obtener el ancho de la ventana
-
+  const { width: windowWidth } = Dimensions.get('window'); // Obtener el ancho de la ventana
   const navigation = useNavigation();
 
   // Verificación explícita de que los valores followers y following existen y son números válidos
-  const followersCount =
-    typeof MyData.followers === 'number' ? MyData.followers : 0;
-  const followingCount =
-    typeof MyData.following === 'number' ? MyData.following : 0;
+  const followersCount = typeof MyData.followers === 'number' ? MyData.followers : 0;
+  const followingCount = typeof MyData.following === 'number' ? MyData.following : 0;
 
-    const handleEditPress = () => {
-      navigation.navigate('EditProfile');
-    };
-  
-    const handleSavedPress = () => {
-      console.log('Guardados');
-    };
-  
+  const handleEditPress = () => {
+    navigation.navigate('EditProfile');
+  };
+
+  const handleSavedPress = () => {
+    console.log('Guardados');
+  };
 
   return (
     <View style={styles.container}>
       {/* Imagen de fondo */}
-      {MyData.coverImage && (
-        <Image
-          source={{uri: MyData.coverImage}}
-          style={[styles.coverImage, {width: windowWidth}]} // Ajustamos el ancho de la imagen al de la pantalla
-          resizeMode="cover" // Aseguramos que la imagen cubra todo el área del cover
-        />
-      )}
+      <Image
+        source={MyData.coverImage ? { uri: MyData.coverImage } : defaultCover}
+        style={[styles.coverImage, { width: windowWidth }]}
+        resizeMode="cover"
+      />
 
       {/* Información del perfil */}
       <View style={styles.profileInfoContainer}>
         <View style={styles.MyDataSection}>
           <View style={styles.buttonAllign}>
             {/* Avatar */}
-            {MyData.avatar && (
-              <Image source={{uri: MyData.avatar}} style={styles.avatar} />
-            )}
+            <Image
+              source={MyData.avatar ? { uri: MyData.avatar } : defaultAvatar}
+              style={styles.avatar}
+            />
             {/* Botón de editar */}
             <TouchableOpacity
               style={styles.edit}
               onPress={handleEditPress}>
-              <Text style={styles.editButtonText}> Editar
-              </Text>
+              <Text style={styles.editButtonText}>Editar</Text>
             </TouchableOpacity>
           </View>
           {/* Nombre y username debajo del avatar */}
@@ -89,12 +85,13 @@ const MyProfileHeader = () => {
       <View style={styles.buttonAllign}> 
         {MyData.level && <Text style={styles.level}>Nivel: {MyData.level}</Text>}
         <TouchableOpacity onPress={handleSavedPress}>
-          <Image source={require('../assets/imgs/guardar.png')} style={{width: 24, height: 24, marginRight: 20}} />
+          <Image source={require('../assets/imgs/guardar.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
         </TouchableOpacity>
       </View>
     </View>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     marginTop: 0,
