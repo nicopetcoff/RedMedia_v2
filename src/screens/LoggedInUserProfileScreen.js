@@ -7,16 +7,15 @@ import {
 } from "react-native";
 import MyProfileHeader from "../components/MyProfileHeader";
 import Post from "../components/Post";
-import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { getPosts, getUserData } from "../controller/miApp.controller";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoggedInUserProfileScreen = () => {
-  const dispatch = useDispatch();
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const token = useSelector((state) => state.auth.token);
+  const token= AsyncStorage.getItem('token');
 
   const fetchUserData = async () => {
     try {
