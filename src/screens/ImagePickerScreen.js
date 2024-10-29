@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Button, Image, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import Constants from 'expo-constants';
 
 const ImagePickerScreen = ({ navigation }) => {
   const [selectedImages, setSelectedImages] = useState([]);
@@ -55,6 +56,7 @@ const ImagePickerScreen = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: Constants.statusBarHeight,
     flex: 1,
     padding: 16,
     backgroundColor: '#fff',

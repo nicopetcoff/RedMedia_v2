@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import usersData from '../data/users.json';
 import BackIcon from '../assets/imgs/back.svg'; // Icono personalizado de retroceso
 import SearchIcon from '../assets/imgs/search.svg'; // Icono de búsqueda personalizado
+import Constants from 'expo-constants';
 
 const SearchScreen = () => {
   const navigation = useNavigation();
@@ -72,6 +73,7 @@ const SearchScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: Constants.statusBarHeight,
     flex: 1,
     backgroundColor: '#fff',
   },

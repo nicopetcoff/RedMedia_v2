@@ -9,18 +9,12 @@ import {
 } from 'react-native';
 import MyData from '../data/MyData.json'; // Importamos el archivo JSON con los datos del usuario
 import { useNavigation } from '@react-navigation/native';
-
-// Importa las imágenes por defecto
-import defaultAvatar from '../assets/imgs/avatar.svg'; // Imagen por defecto para avatar
-import defaultCover from '../assets/imgs/cover_image.svg'; // Imagen por defecto para portada
+import Constants from 'expo-constants';
 
 const MyProfileHeader = ({userData}) => {
   const { width: windowWidth } = Dimensions.get('window'); // Obtener el ancho de la ventana
   const navigation = useNavigation();
 
-  // Verificación explícita de que los valores followers y following existen y son números válidos
-  const followersCount = typeof MyData.followers === 'number' ? MyData.followers : 0;
-  const followingCount = typeof MyData.following === 'number' ? MyData.following : 0;
 
   const handleEditPress = () => {
     navigation.navigate('EditProfile');
@@ -33,8 +27,9 @@ const MyProfileHeader = ({userData}) => {
   return (
     <View style={styles.container}>
       {/* Imagen de fondo */}
+      
       <Image
-        source={MyData.coverImage ? { uri: userData.coverImage } : defaultCover}
+        source={userData.coverImage ? { uri: userData.coverImage } : require('../assets/imgs/portadaDefault.png')}
         style={[styles.coverImage, { width: windowWidth }]}
         resizeMode="cover"
       />
@@ -45,7 +40,7 @@ const MyProfileHeader = ({userData}) => {
           <View style={styles.buttonAllign}>
             
             <Image
-              source={MyData.avatar ? { uri: userData.avatar } : defaultAvatar}
+              source={userData.avatar ? { uri: userData.avatar } : require('../assets/imgs/avatarDefault.jpg')}
               style={styles.avatar}
             />
             
@@ -96,10 +91,12 @@ const MyProfileHeader = ({userData}) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 0,
+    paddingTop: Constants.statusBarHeight,
   },
   coverImage: {
     height: 120, // Altura fija de la imagen de fondo
     width: '100%', // Aseguramos que ocupe todo el ancho de la pantalla
+    resizeMode:"cover"
   },
   profileInfoContainer: {
     flexDirection: 'row',
@@ -121,6 +118,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 3,
     borderColor: '#fff',
+    resizeMode:"center"
   },
   MyDataDetails: {
     marginTop: 10,
@@ -128,6 +126,7 @@ const styles = StyleSheet.create({
   },
   name: {
     color: 'black',
+    marginLeft:10,
     fontFamily: 'Roboto',
     fontSize: 20,
     fontWeight: 'bold',
@@ -141,7 +140,7 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    width: '80%',
+    width: '85%',
   },
   statItem: {
     marginRight: 20,

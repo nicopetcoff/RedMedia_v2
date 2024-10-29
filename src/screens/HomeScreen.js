@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'reac
 import Post from '../components/Post';
 import { getPosts } from '../controller/miApp.controller'; // Asegúrate de importar correctamente la función
 import { useNavigation } from '@react-navigation/native'; // Importamos el hook de navegación
+import Constants from 'expo-constants';
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
@@ -63,6 +64,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     paddingHorizontal: 10,
+    paddingTop: Constants.statusBarHeight,
   },
   headerContainer: {
     flexDirection: 'row',
