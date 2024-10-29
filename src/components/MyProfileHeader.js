@@ -5,47 +5,37 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Image, // Importamos el componente Image de React Native
+  Image,
 } from 'react-native';
-import MyData from '../data/MyData.json'; // Importamos el archivo JSON con los datos del usuario
+import MyData from '../data/MyData.json';
 import { useNavigation } from '@react-navigation/native';
 
-// Importa las imágenes por defecto
-import defaultAvatar from '../assets/imgs/avatar.svg'; // Imagen por defecto para avatar
-import defaultCover from '../assets/imgs/cover_image.svg'; // Imagen por defecto para portada
+import defaultAvatar from '../assets/imgs/avatar.svg';
+import defaultCover from '../assets/imgs/cover_image.svg';
 
-const MyProfileHeader = ({userData}) => {
-  const { width: windowWidth } = Dimensions.get('window'); // Obtener el ancho de la ventana
+const MyProfileHeader = ({ userData }) => {
+  const { width: windowWidth } = Dimensions.get('window');
   const navigation = useNavigation();
 
-
   const handleEditPress = () => {
-    navigation.navigate('EditProfile');
-  };
-
-  const handleSavedPress = () => {
-    console.log('Guardados');
+    navigation.navigate('EditProfile', { avatar: userData.avatar }); // Pasar el avatar como parámetro
   };
 
   return (
     <View style={styles.container}>
-      {/* Imagen de fondo */}
       <Image
         source={MyData.coverImage ? { uri: userData.coverImage } : defaultCover}
         style={[styles.coverImage, { width: windowWidth }]}
         resizeMode="cover"
       />
-
       
       <View style={styles.profileInfoContainer}>
         <View style={styles.MyDataSection}>
           <View style={styles.buttonAllign}>
-            
             <Image
               source={userData.avatar ? { uri: userData.avatar } : defaultAvatar}
               style={styles.avatar}
             />
-            
             <TouchableOpacity
               style={styles.edit}
               onPress={handleEditPress}>
@@ -82,9 +72,6 @@ const MyProfileHeader = ({userData}) => {
       {MyData.bio && <Text style={styles.bio}>{userData.description}</Text>}
       <View style={styles.buttonAllign}> 
         {MyData.level && <Text style={styles.level}>Nivel: {userData.level}</Text>}
-        <TouchableOpacity onPress={handleSavedPress}>
-          <Image source={require('../assets/imgs/guardar.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -95,8 +82,8 @@ const styles = StyleSheet.create({
     marginTop: 0,
   },
   coverImage: {
-    height: 120, // Altura fija de la imagen de fondo
-    width: '100%', // Aseguramos que ocupe todo el ancho de la pantalla
+    height: 120,
+    width: '100%',
   },
   profileInfoContainer: {
     flexDirection: 'row',
@@ -180,13 +167,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 30,
-  },
-  postsContainer: {
-    paddingBottom: 30, // Espacio al final para evitar superposición
-  },
-  columnWrapper: {
-    justifyContent: 'space-between', // Asegura que los dos posts se distribuyan correctamente
-    marginBottom: 10, // Espacio entre filas de posts
   },
 });
 
