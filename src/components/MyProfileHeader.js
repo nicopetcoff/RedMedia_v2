@@ -14,7 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import defaultAvatar from '../assets/imgs/avatar.svg'; // Imagen por defecto para avatar
 import defaultCover from '../assets/imgs/cover_image.svg'; // Imagen por defecto para portada
 
-const MyProfileHeader = () => {
+const MyProfileHeader = ({userData}) => {
   const { width: windowWidth } = Dimensions.get('window'); // Obtener el ancho de la ventana
   const navigation = useNavigation();
 
@@ -34,46 +34,47 @@ const MyProfileHeader = () => {
     <View style={styles.container}>
       {/* Imagen de fondo */}
       <Image
-        source={MyData.coverImage ? { uri: MyData.coverImage } : defaultCover}
+        source={MyData.coverImage ? { uri: userData.coverImage } : defaultCover}
         style={[styles.coverImage, { width: windowWidth }]}
         resizeMode="cover"
       />
 
-      {/* Información del perfil */}
+      
       <View style={styles.profileInfoContainer}>
         <View style={styles.MyDataSection}>
           <View style={styles.buttonAllign}>
-            {/* Avatar */}
+            
             <Image
-              source={MyData.avatar ? { uri: MyData.avatar } : defaultAvatar}
+              source={MyData.avatar ? { uri: userData.avatar } : defaultAvatar}
               style={styles.avatar}
             />
-            {/* Botón de editar */}
+            
             <TouchableOpacity
               style={styles.edit}
               onPress={handleEditPress}>
               <Text style={styles.editButtonText}>Editar</Text>
             </TouchableOpacity>
           </View>
-          {/* Nombre y username debajo del avatar */}
+          
           <View style={styles.MyDataDetails}>
             <View>
-              {MyData.name && <Text style={styles.name}>{MyData.name}</Text>}
+              {MyData.name && <Text style={styles.name}>{userData.nombre}</Text>}
+              {MyData.name && <Text style={styles.name}>{userData.apellido}</Text>}
               {MyData.username && (
-                <Text style={styles.MyDataname}>{MyData.username}</Text>
+                <Text style={styles.MyDataname}>{userData.usernickname}</Text>
               )}
             </View>
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
-                <Text style={styles.statText}>{MyData.postsCount || 0}</Text>
+                <Text style={styles.statText}>{userData.postsCount || 0}</Text>
                 <Text style={styles.statLabel}>Posts</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statText}>{followersCount}</Text>
+                <Text style={styles.statText}>{userData.followersCount || 0}</Text>
                 <Text style={styles.statLabel}>Followers</Text>
               </View>
               <View style={styles.statItem}>
-                <Text style={styles.statText}>{followingCount}</Text>
+                <Text style={styles.statText}>{userData.followingCount || 0}</Text>
                 <Text style={styles.statLabel}>Following</Text>
               </View>
             </View>
@@ -81,9 +82,9 @@ const MyProfileHeader = () => {
         </View>
       </View>
 
-      {MyData.bio && <Text style={styles.bio}>{MyData.bio}</Text>}
+      {MyData.bio && <Text style={styles.bio}>{userData.description}</Text>}
       <View style={styles.buttonAllign}> 
-        {MyData.level && <Text style={styles.level}>Nivel: {MyData.level}</Text>}
+        {MyData.level && <Text style={styles.level}>Nivel: {userData.level}</Text>}
         <TouchableOpacity onPress={handleSavedPress}>
           <Image source={require('../assets/imgs/guardar.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
         </TouchableOpacity>

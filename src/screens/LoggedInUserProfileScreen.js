@@ -3,29 +3,36 @@ import {
   View,
   StyleSheet,
   FlatList,
-  Button,
   ActivityIndicator,
 } from "react-native";
 import MyProfileHeader from "../components/MyProfileHeader";
 import Post from "../components/Post";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import { getPosts } from "../controller/miApp.controller";
-import MyData from "../data/MyData.json"; // Importa el JSON del usuario
+import { getPosts, getUserData } from "../controller/miApp.controller";
 
 const LoggedInUserProfileScreen = () => {
   const dispatch = useDispatch();
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+
+  const fetchUserData = async () => {
+    try {
+      const data = await getUserData(token);
+      setUserData(data.data); // Guardar solo la sección 'data'
+    } catch (error) {
+      console.error("Error loading user data", error);
+    }
+  };
 
   const fetchUserPosts = async () => {
     setLoading(true);
     try {
       const data = await getPosts();
-      // Filtra los posts que corresponden al usuario del JSON
       const filteredPosts = data.data.filter(
-        (post) => post.user === MyData.username
+        (post) => post.user === userData?.usernickname // Asegúrate de que userData esté definido
       );
       setUserPosts(filteredPosts);
     } catch (error) {
@@ -36,9 +43,15 @@ const LoggedInUserProfileScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserPosts();
-    }, [])
+      fetchUserData();
+    }, [token])
   );
+
+  useEffect(() => {
+    if (userData) {
+      fetchUserPosts();
+    }
+  }, [userData]);
 
   if (loading) {
     return (
@@ -58,7 +71,7 @@ const LoggedInUserProfileScreen = () => {
         columnWrapperStyle={styles.row}
         ListHeaderComponent={
           <>
-            <MyProfileHeader userData={MyData} />
+            <MyProfileHeader userData={userData} />
           </>
         }
         showsVerticalScrollIndicator={false}
@@ -75,10 +88,6 @@ const styles = StyleSheet.create({
   row: {
     justifyContent: "space-between",
     marginHorizontal: 10,
-  },
-  logoutButtonContainer: {
-    marginVertical: 20,
-    paddingHorizontal: 20,
   },
   loaderContainer: {
     flex: 1,

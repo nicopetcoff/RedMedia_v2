@@ -111,3 +111,33 @@ export const sendPasswordResetEmail = async (email) => {
     throw error;
   }
 };
+
+// Función user/me
+export const getUserData = async (token) => {
+  let url = urlWebServices.getProfile; // URL para el endpoint de perfil
+  try {
+    console.log("Sending request to:", url); // Muestra la URL del endpoint
+    console.log("With token:", token); // Muestra el token que se está enviando
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "x-access-token": token, // Enviar el token en los headers
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    console.log("Received data:", data); // Muestra los datos recibidos
+
+    return data; // Retorna los datos del usuario
+  } catch (error) {
+    console.error("Error fetching user data:", error); // Manejo de errores
+    throw error; // Propaga el error
+  }
+};
+
