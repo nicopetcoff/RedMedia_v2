@@ -1,27 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { signOut } from '../redux/authSlice';
-import * as ImagePicker from 'expo-image-picker'; // Importa el ImagePicker
-import { updateProfileImage } from '../controller/miApp.controller'; // Asegúrate de importar la función
+import * as ImagePicker from 'expo-image-picker';
+import { updateProfileImage } from '../controller/miApp.controller';
 
-const EditProfileScreen = ({ navigation }) => {
+const EditProfileScreen = ({ navigation, route }) => {
   const dispatch = useDispatch();
+  const { avatar } = route.params; // Obtén el avatar de los parámetros
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [gender, setGender] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [profileImage, setProfileImage] = useState(''); // Estado para la imagen de perfil
-  const [message, setMessage] = useState(''); // Estado para el mensaje de confirmación
+  const [profileImage, setProfileImage] = useState(avatar); // Inicializa el perfil con el avatar recibido
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    setProfileImage(avatar); // Asegúrate de que profileImage tenga el valor inicial del avatar
+  }, [avatar]);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('userToken');
     dispatch(signOut());
   };
 
-  // Función para seleccionar la imagen o tomar una nueva foto
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
@@ -38,8 +42,8 @@ const EditProfileScreen = ({ navigation }) => {
     });
 
     if (!action.canceled) {
-      setProfileImage(action.assets[0].uri); // Guarda la URI de la imagen seleccionada
-      await handleImageUpdate(action.assets[0].uri); // Llama a la función para actualizar la imagen en el backend
+      setProfileImage(action.assets[0].uri);
+      await handleImageUpdate(action.assets[0].uri);
     }
   };
 
@@ -57,23 +61,22 @@ const EditProfileScreen = ({ navigation }) => {
     });
 
     if (!result.canceled) {
-      setProfileImage(result.assets[0].uri); // Guarda la URI de la foto tomada
-      await handleImageUpdate(result.assets[0].uri); // Llama a la función para actualizar la imagen en el backend
+      setProfileImage(result.assets[0].uri);
+      await handleImageUpdate(result.assets[0].uri);
     }
   };
 
-  // Función para actualizar la imagen de perfil en el backend
   const handleImageUpdate = async (imageUri) => {
-    const token = await AsyncStorage.getItem('userToken'); // Obtiene el token del almacenamiento
+    const token = await AsyncStorage.getItem('userToken');
     if (token) {
       try {
-        const response = await updateProfileImage(imageUri, token); // Llama a la función para enviar la imagen al backend
-        setMessage('Foto de perfil actualizada correctamente.'); // Mensaje de confirmación
-        setTimeout(() => setMessage(''), 3000); // Limpia el mensaje después de 3 segundos
+        const response = await updateProfileImage(imageUri, token);
+        setMessage('Foto de perfil actualizada correctamente.');
+        setTimeout(() => setMessage(''), 3000);
       } catch (error) {
         console.error('Error al actualizar la imagen:', error);
-        setMessage('Error al actualizar la foto de perfil.'); // Mensaje de error
-        setTimeout(() => setMessage(''), 3000); // Limpia el mensaje después de 3 segundos
+        setMessage('Error al actualizar la foto de perfil.');
+        setTimeout(() => setMessage(''), 3000);
       }
     } else {
       alert('No se pudo obtener el token de usuario.');
@@ -82,17 +85,14 @@ const EditProfileScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Header con icono de cerrar */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
         <Text style={styles.closeButtonText}>×</Text>
       </TouchableOpacity>
 
-      {/* Título */}
       <Text style={styles.title}>My Account</Text>
 
-      {/* Imagen de perfil y botones de cambio de foto */}
       <Image
-        source={profileImage ? { uri: profileImage } : { uri: 'https://randomuser.me/api/portraits/men/18.jpg' }} // Imagen por defecto
+        source={profileImage ? { uri: profileImage } : { uri: 'https://randomuser.me/api/portraits/men/18.jpg' }}
         style={styles.profileImage}
       />
       <View style={styles.buttonContainer}>
@@ -104,7 +104,6 @@ const EditProfileScreen = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      {/* Mensaje de confirmación */}
       {message ? <Text style={styles.message}>{message}</Text> : null}
 
       <View style={styles.formSection}>
@@ -135,7 +134,6 @@ const EditProfileScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Configuración de apariencia y botones de cierre de sesión y eliminación de cuenta */}
       <View style={styles.settingsSection}>
         <Text style={styles.sectionTitle}>SETTINGS</Text>
         <View style={styles.appearanceRow}>
