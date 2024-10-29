@@ -1,25 +1,39 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, StyleSheet, FlatList, Button, ActivityIndicator } from 'react-native';
-import MyProfileHeader from '../components/MyProfileHeader';
-import Post from '../components/Post';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
-import { useFocusEffect } from '@react-navigation/native';
-import { signOut } from '../redux/authSlice';
-import { getPosts } from '../controller/miApp.controller';
-import MyData from '../data/MyData.json'; // Importa el JSON del usuario
+import React, { useState, useEffect, useCallback } from "react";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
+import MyProfileHeader from "../components/MyProfileHeader";
+import Post from "../components/Post";
+import { useDispatch, useSelector } from "react-redux";
+import { useFocusEffect } from "@react-navigation/native";
+import { getPosts, getUserData } from "../controller/miApp.controller";
 
 const LoggedInUserProfileScreen = () => {
   const dispatch = useDispatch();
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [userData, setUserData] = useState(null);
+  const token = useSelector((state) => state.auth.token);
+
+  const fetchUserData = async () => {
+    try {
+      const data = await getUserData(token);
+      setUserData(data.data); // Guardar solo la sección 'data'
+    } catch (error) {
+      console.error("Error loading user data", error);
+    }
+  };
 
   const fetchUserPosts = async () => {
     setLoading(true);
     try {
       const data = await getPosts();
-      // Filtra los posts que corresponden al usuario del JSON
-      const filteredPosts = data.data.filter(post => post.user === MyData.username);
+      const filteredPosts = data.data.filter(
+        (post) => post.user === userData?.usernickname // Asegúrate de que userData esté definido
+      );
       setUserPosts(filteredPosts);
     } catch (error) {
       console.error("Error loading posts", error);
@@ -29,14 +43,15 @@ const LoggedInUserProfileScreen = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchUserPosts();
-    }, [])
+      fetchUserData();
+    }, [token])
   );
 
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem('userToken');
-    dispatch(signOut());
-  };
+  useEffect(() => {
+    if (userData) {
+      fetchUserPosts();
+    }
+  }, [userData]);
 
   if (loading) {
     return (
@@ -51,15 +66,12 @@ const LoggedInUserProfileScreen = () => {
       <FlatList
         data={userPosts}
         renderItem={({ item }) => <Post item={item} />}
-        keyExtractor={item => item._id.toString()}
+        keyExtractor={(item) => item._id.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}
         ListHeaderComponent={
           <>
-            <MyProfileHeader userData={MyData} /> 
-            <View style={styles.logoutButtonContainer}>
-              <Button title="Cerrar Sesión" onPress={handleLogout} color="#FF3B30" />
-            </View>
+            <MyProfileHeader userData={userData} />
           </>
         }
         showsVerticalScrollIndicator={false}
@@ -71,20 +83,16 @@ const LoggedInUserProfileScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   row: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     marginHorizontal: 10,
-  },
-  logoutButtonContainer: {
-    marginVertical: 20,
-    paddingHorizontal: 20,
   },
   loaderContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 
