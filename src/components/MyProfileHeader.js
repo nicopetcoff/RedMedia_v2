@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     textAlign: 'left',
     marginHorizontal: 20,
-    marginVertical: 10,
   },
   level: {
     fontSize: 14,

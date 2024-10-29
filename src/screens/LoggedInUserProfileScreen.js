@@ -15,10 +15,13 @@ const LoggedInUserProfileScreen = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  const token= AsyncStorage.getItem('token');
+  
+  
+  
 
   const fetchUserData = async () => {
     try {
+      const token= await AsyncStorage.getItem('token');
       const data = await getUserData(token);
       setUserData(data.data); // Guardar solo la sección 'data'
     } catch (error) {
@@ -43,7 +46,7 @@ const LoggedInUserProfileScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchUserData();
-    }, [token])
+    }, [])
   );
 
   useEffect(() => {
