@@ -21,10 +21,13 @@ const MyProfileHeader = ({ userData }) => {
     navigation.navigate('EditProfile', { avatar: userData.avatar }); // Pasar el avatar como parámetro
   };
 
+  console.log('userData:', userData); // Agregado para verificar el contenido de userData
+
   return (
     <View style={styles.container}>
+      {/* Verifica si userData.coverImage existe antes de usarlo */}
       <Image
-        source={MyData.coverImage ? { uri: userData.coverImage } : defaultCover}
+        source={userData.coverImage ? { uri: userData.coverImage } : defaultCover}
         style={[styles.coverImage, { width: windowWidth }]}
         resizeMode="cover"
       />
@@ -69,9 +72,9 @@ const MyProfileHeader = ({ userData }) => {
         </View>
       </View>
 
-      {MyData.bio && <Text style={styles.bio}>{userData.description}</Text>}
+      {MyData.bio && <Text style={styles.bio}>{userData.bio}</Text>}
       <View style={styles.buttonAllign}> 
-        {MyData.level && <Text style={styles.level}>Nivel: {userData.level}</Text>}
+        {MyData.level && <Text style={styles.level}>Nivel: {userData.level || 0}</Text>}
       </View>
     </View>
   );
