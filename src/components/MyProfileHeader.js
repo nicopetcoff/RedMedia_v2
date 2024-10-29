@@ -18,9 +18,6 @@ const MyProfileHeader = ({userData}) => {
   const { width: windowWidth } = Dimensions.get('window'); // Obtener el ancho de la ventana
   const navigation = useNavigation();
 
-  // Verificación explícita de que los valores followers y following existen y son números válidos
-  const followersCount = typeof MyData.followers === 'number' ? MyData.followers : 0;
-  const followingCount = typeof MyData.following === 'number' ? MyData.following : 0;
 
   const handleEditPress = () => {
     navigation.navigate('EditProfile');
@@ -45,7 +42,7 @@ const MyProfileHeader = ({userData}) => {
           <View style={styles.buttonAllign}>
             
             <Image
-              source={MyData.avatar ? { uri: userData.avatar } : defaultAvatar}
+              source={userData.avatar ? { uri: userData.avatar } : defaultAvatar}
               style={styles.avatar}
             />
             

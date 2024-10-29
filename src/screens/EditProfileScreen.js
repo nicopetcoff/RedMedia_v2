@@ -1,9 +1,10 @@
-// EditProfileScreen.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useDispatch } from 'react-redux';
 import { signOut } from '../redux/authSlice';
+import * as ImagePicker from 'expo-image-picker'; // Importa el ImagePicker
+import { updateProfileImage } from '../controller/miApp.controller'; // Asegúrate de importar la función
 
 const EditProfileScreen = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -12,10 +13,71 @@ const EditProfileScreen = ({ navigation }) => {
   const [description, setDescription] = useState('');
   const [gender, setGender] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [profileImage, setProfileImage] = useState(''); // Estado para la imagen de perfil
+  const [message, setMessage] = useState(''); // Estado para el mensaje de confirmación
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('userToken');
     dispatch(signOut());
+  };
+
+  // Función para seleccionar la imagen o tomar una nueva foto
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert('Es necesario dar permisos para acceder a la galería.');
+      return;
+    }
+
+    const action = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!action.canceled) {
+      setProfileImage(action.assets[0].uri); // Guarda la URI de la imagen seleccionada
+      await handleImageUpdate(action.assets[0].uri); // Llama a la función para actualizar la imagen en el backend
+    }
+  };
+
+  const takePhoto = async () => {
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.granted === false) {
+      alert('Es necesario dar permisos para acceder a la cámara.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri); // Guarda la URI de la foto tomada
+      await handleImageUpdate(result.assets[0].uri); // Llama a la función para actualizar la imagen en el backend
+    }
+  };
+
+  // Función para actualizar la imagen de perfil en el backend
+  const handleImageUpdate = async (imageUri) => {
+    const token = await AsyncStorage.getItem('userToken'); // Obtiene el token del almacenamiento
+    if (token) {
+      try {
+        const response = await updateProfileImage(imageUri, token); // Llama a la función para enviar la imagen al backend
+        setMessage('Foto de perfil actualizada correctamente.'); // Mensaje de confirmación
+        setTimeout(() => setMessage(''), 3000); // Limpia el mensaje después de 3 segundos
+      } catch (error) {
+        console.error('Error al actualizar la imagen:', error);
+        setMessage('Error al actualizar la foto de perfil.'); // Mensaje de error
+        setTimeout(() => setMessage(''), 3000); // Limpia el mensaje después de 3 segundos
+      }
+    } else {
+      alert('No se pudo obtener el token de usuario.');
+    }
   };
 
   return (
@@ -28,16 +90,23 @@ const EditProfileScreen = ({ navigation }) => {
       {/* Título */}
       <Text style={styles.title}>My Account</Text>
 
-      {/* Imagen de perfil y botón de cambio de foto */}
+      {/* Imagen de perfil y botones de cambio de foto */}
       <Image
-        source={{ uri: 'https://randomuser.me/api/portraits/men/10.jpg' }}
+        source={profileImage ? { uri: profileImage } : { uri: 'https://randomuser.me/api/portraits/men/18.jpg' }} // Imagen por defecto
         style={styles.profileImage}
       />
-      <TouchableOpacity>
-        <Text style={styles.changePhotoText}>Change profile photo</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={pickImage}>
+          <Text style={styles.changePhotoText}>Change profile photo from gallery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={takePhoto}>
+          <Text style={styles.changePhotoText}>Take a photo</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Formulario de edición de perfil */}
+      {/* Mensaje de confirmación */}
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+
       <View style={styles.formSection}>
         <Text style={styles.sectionTitle}>PROFILE</Text>
         <TextInput
@@ -117,6 +186,15 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     color: '#007AFF',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  message: {
+    color: 'green',
     textAlign: 'center',
     marginVertical: 10,
   },
