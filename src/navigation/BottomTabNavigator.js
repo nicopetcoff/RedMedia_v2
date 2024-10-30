@@ -10,7 +10,7 @@ import ProfileIcon from '../assets/imgs/profile.svg';
 import HomeStackScreen from './HomeStackScreen';
 import LoggedInProfileStackScreen from './LoggedInProfileStackScreen';
 import ImagePickerScreen from '../screens/ImagePickerScreen';
-import NotificationStackScreen from '../screens/NotificationScreen';
+import NotificationStackScreen from '../navigation/NotificationStackScreen';
 import LoggedInUserProfileScreen from '../screens/LoggedInUserProfileScreen';
 import SearchStackScreen from './SearchStackScreen';
 

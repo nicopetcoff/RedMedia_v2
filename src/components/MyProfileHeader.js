@@ -19,7 +19,6 @@ const MyProfileHeader = ({ userData }) => {
     navigation.navigate('EditProfile', { avatar: userData.avatar }); // Pasar el avatar como parámetro
   };
 
-  console.log('userData:', userData); // Agregado para verificar el contenido de userData
 
   return (
     <View style={styles.container}>
