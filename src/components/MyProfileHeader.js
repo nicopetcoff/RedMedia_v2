@@ -9,9 +9,7 @@ import {
 } from 'react-native';
 import MyData from '../data/MyData.json';
 import { useNavigation } from '@react-navigation/native';
-
-import defaultAvatar from '../assets/imgs/avatar.svg';
-import defaultCover from '../assets/imgs/cover_image.svg';
+import Constants from 'expo-constants';
 
 const MyProfileHeader = ({ userData }) => {
   const { width: windowWidth } = Dimensions.get('window');
@@ -25,9 +23,10 @@ const MyProfileHeader = ({ userData }) => {
 
   return (
     <View style={styles.container}>
-      {/* Verifica si userData.coverImage existe antes de usarlo */}
+      {/* Imagen de fondo */}
+      
       <Image
-        source={userData.coverImage ? { uri: userData.coverImage } : defaultCover}
+        source={userData.coverImage ? { uri: userData.coverImage } : require('../assets/imgs/portadaDefault.png')}
         style={[styles.coverImage, { width: windowWidth }]}
         resizeMode="cover"
       />
@@ -36,7 +35,7 @@ const MyProfileHeader = ({ userData }) => {
         <View style={styles.MyDataSection}>
           <View style={styles.buttonAllign}>
             <Image
-              source={userData.avatar ? { uri: userData.avatar } : defaultAvatar}
+              source={userData.avatar ? { uri: userData.avatar } : require('../assets/imgs/avatarDefault.jpg')}
               style={styles.avatar}
             />
             <TouchableOpacity
@@ -83,10 +82,12 @@ const MyProfileHeader = ({ userData }) => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 0,
+    paddingTop: Constants.statusBarHeight,
   },
   coverImage: {
-    height: 120,
-    width: '100%',
+    height: 120, // Altura fija de la imagen de fondo
+    width: '100%', // Aseguramos que ocupe todo el ancho de la pantalla
+    resizeMode:"cover"
   },
   profileInfoContainer: {
     flexDirection: 'row',
@@ -108,6 +109,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 3,
     borderColor: '#fff',
+    resizeMode:"center"
   },
   MyDataDetails: {
     marginTop: 10,
@@ -115,6 +117,7 @@ const styles = StyleSheet.create({
   },
   name: {
     color: 'black',
+    marginLeft:10,
     fontFamily: 'Roboto',
     fontSize: 20,
     fontWeight: 'bold',
@@ -128,7 +131,7 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    width: '80%',
+    width: '85%',
   },
   statItem: {
     marginRight: 20,
@@ -149,7 +152,6 @@ const styles = StyleSheet.create({
     color: 'gray',
     textAlign: 'left',
     marginHorizontal: 20,
-    marginVertical: 10,
   },
   level: {
     fontSize: 14,

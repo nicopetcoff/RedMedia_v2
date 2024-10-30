@@ -5,6 +5,7 @@ import Notification from '../components/Notification';
 import notificaciones from '../data/notificaciones.json';
 import BackIcon from '../assets/imgs/back.svg'; // Icono personalizado de regreso
 import { useNavigation } from '@react-navigation/native';
+import Constants from 'expo-constants';
 
 const NotificationScreen = () => {
   const navigation = useNavigation();
@@ -31,6 +32,7 @@ const NotificationScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: Constants.statusBarHeight,
     flex: 1,
     backgroundColor: '#fcfcfc',
     paddingHorizontal: 10,

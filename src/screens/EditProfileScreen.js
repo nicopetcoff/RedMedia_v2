@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useDispatch } from 'react-redux';
-import { signOut } from '../redux/authSlice';
-import * as ImagePicker from 'expo-image-picker';
-import { updateProfileImage } from '../controller/miApp.controller';
+import { useToggleContext } from '../context/AuthProvider';
 
-const EditProfileScreen = ({ navigation, route }) => {
-  const dispatch = useDispatch();
-  const { avatar } = route.params; // Obtén el avatar de los parámetros
+const EditProfileScreen = ({ navigation }) => {
+  const { signOut } = useToggleContext();
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -22,8 +17,7 @@ const EditProfileScreen = ({ navigation, route }) => {
   }, [avatar]);
 
   const handleLogout = async () => {
-    await AsyncStorage.removeItem('userToken');
-    dispatch(signOut());
+    signOut();
   };
 
   const pickImage = async () => {
