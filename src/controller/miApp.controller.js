@@ -139,3 +139,36 @@ export const getUserData = async (token) => {
   }
 };
 
+export const updateProfileImage = async (imageUri, token) => {
+  const formData = new FormData();
+  
+  // Cambia 'avatar' a lo que espera tu backend si es necesario
+  formData.append('avatar', {
+    uri: imageUri,
+    type: 'image/jpeg', // Ajusta el tipo si es necesario (image/png para PNG)
+    name: 'profile.jpg', // El nombre que desees
+  });
+
+  try {
+    const response = await fetch(`${urlWebServices.updateProfileImage}`, { // Asegúrate de que la URL sea correcta
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'x-access-token': token, // Agrega el token aquí
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Error al actualizar la imagen de perfil: ' + response.status);
+    }
+
+    const data = await response.json();
+    console.log('Imagen de perfil actualizada:', data);
+    return data; // Devuelve los datos que necesites del backend
+  } catch (error) {
+    console.error('Error al enviar la imagen:', error);
+    throw error; // Propaga el error
+  }
+};
+

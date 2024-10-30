@@ -1,5 +1,4 @@
-// EditProfileScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
 import { useToggleContext } from '../context/AuthProvider';
 
@@ -10,31 +9,97 @@ const EditProfileScreen = ({ navigation }) => {
   const [description, setDescription] = useState('');
   const [gender, setGender] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [profileImage, setProfileImage] = useState(avatar); // Inicializa el perfil con el avatar recibido
+  const [message, setMessage] = useState('');
+
+  useEffect(() => {
+    setProfileImage(avatar); // Asegúrate de que profileImage tenga el valor inicial del avatar
+  }, [avatar]);
 
   const handleLogout = async () => {
     signOut();
   };
 
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert('Es necesario dar permisos para acceder a la galería.');
+      return;
+    }
+
+    const action = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!action.canceled) {
+      setProfileImage(action.assets[0].uri);
+      await handleImageUpdate(action.assets[0].uri);
+    }
+  };
+
+  const takePhoto = async () => {
+    const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
+    if (cameraPermission.granted === false) {
+      alert('Es necesario dar permisos para acceder a la cámara.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setProfileImage(result.assets[0].uri);
+      await handleImageUpdate(result.assets[0].uri);
+    }
+  };
+
+  const handleImageUpdate = async (imageUri) => {
+    const token = await AsyncStorage.getItem('userToken');
+    if (token) {
+      try {
+        const response = await updateProfileImage(imageUri, token);
+        setMessage('Foto de perfil actualizada correctamente.');
+        setTimeout(() => setMessage(''), 3000);
+      } catch (error) {
+        console.error('Error al actualizar la imagen:', error);
+        setMessage('Error al actualizar la foto de perfil.');
+        setTimeout(() => setMessage(''), 3000);
+      }
+    } else {
+      alert('No se pudo obtener el token de usuario.');
+    }
+  };
+
   return (
     <View style={styles.container}>
-      {/* Header con icono de cerrar */}
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
         <Text style={styles.closeButtonText}>×</Text>
       </TouchableOpacity>
 
-      {/* Título */}
       <Text style={styles.title}>My Account</Text>
 
-      {/* Imagen de perfil y botón de cambio de foto */}
       <Image
-        source={{ uri: 'https://randomuser.me/api/portraits/men/10.jpg' }}
+        source={profileImage ? { uri: profileImage } : { uri: 'https://randomuser.me/api/portraits/men/18.jpg' }}
         style={styles.profileImage}
       />
-      <TouchableOpacity>
-        <Text style={styles.changePhotoText}>Change profile photo</Text>
-      </TouchableOpacity>
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity onPress={pickImage}>
+          <Text style={styles.changePhotoText}>Change profile photo from gallery</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={takePhoto}>
+          <Text style={styles.changePhotoText}>Take a photo</Text>
+        </TouchableOpacity>
+      </View>
 
-      {/* Formulario de edición de perfil */}
+      {message ? <Text style={styles.message}>{message}</Text> : null}
+
       <View style={styles.formSection}>
         <Text style={styles.sectionTitle}>PROFILE</Text>
         <TextInput
@@ -63,7 +128,6 @@ const EditProfileScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Configuración de apariencia y botones de cierre de sesión y eliminación de cuenta */}
       <View style={styles.settingsSection}>
         <Text style={styles.sectionTitle}>SETTINGS</Text>
         <View style={styles.appearanceRow}>
@@ -114,6 +178,15 @@ const styles = StyleSheet.create({
   },
   changePhotoText: {
     color: '#007AFF',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  buttonContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  message: {
+    color: 'green',
     textAlign: 'center',
     marginVertical: 10,
   },

@@ -5,24 +5,21 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  Image, // Importamos el componente Image de React Native
+  Image,
 } from 'react-native';
-import MyData from '../data/MyData.json'; // Importamos el archivo JSON con los datos del usuario
+import MyData from '../data/MyData.json';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 
-const MyProfileHeader = ({userData}) => {
-  const { width: windowWidth } = Dimensions.get('window'); // Obtener el ancho de la ventana
+const MyProfileHeader = ({ userData }) => {
+  const { width: windowWidth } = Dimensions.get('window');
   const navigation = useNavigation();
 
-
   const handleEditPress = () => {
-    navigation.navigate('EditProfile');
+    navigation.navigate('EditProfile', { avatar: userData.avatar }); // Pasar el avatar como parámetro
   };
 
-  const handleSavedPress = () => {
-    console.log('Guardados');
-  };
+  console.log('userData:', userData); // Agregado para verificar el contenido de userData
 
   return (
     <View style={styles.container}>
@@ -33,17 +30,14 @@ const MyProfileHeader = ({userData}) => {
         style={[styles.coverImage, { width: windowWidth }]}
         resizeMode="cover"
       />
-
       
       <View style={styles.profileInfoContainer}>
         <View style={styles.MyDataSection}>
           <View style={styles.buttonAllign}>
-            
             <Image
               source={userData.avatar ? { uri: userData.avatar } : require('../assets/imgs/avatarDefault.jpg')}
               style={styles.avatar}
             />
-            
             <TouchableOpacity
               style={styles.edit}
               onPress={handleEditPress}>
@@ -77,12 +71,9 @@ const MyProfileHeader = ({userData}) => {
         </View>
       </View>
 
-      {MyData.bio && <Text style={styles.bio}>{userData.description}</Text>}
+      {MyData.bio && <Text style={styles.bio}>{userData.bio}</Text>}
       <View style={styles.buttonAllign}> 
-        {MyData.level && <Text style={styles.level}>Nivel: {userData.level}</Text>}
-        <TouchableOpacity onPress={handleSavedPress}>
-          <Image source={require('../assets/imgs/guardar.png')} style={{ width: 24, height: 24, marginRight: 20 }} />
-        </TouchableOpacity>
+        {MyData.level && <Text style={styles.level}>Nivel: {userData.level || 0}</Text>}
       </View>
     </View>
   );
@@ -181,13 +172,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto',
     textAlign: 'center',
     lineHeight: 30,
-  },
-  postsContainer: {
-    paddingBottom: 30, // Espacio al final para evitar superposición
-  },
-  columnWrapper: {
-    justifyContent: 'space-between', // Asegura que los dos posts se distribuyan correctamente
-    marginBottom: 10, // Espacio entre filas de posts
   },
 });
 
