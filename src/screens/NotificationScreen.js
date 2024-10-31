@@ -2,7 +2,7 @@
 import React from 'react';
 import {View, Text, FlatList, StyleSheet,TouchableOpacity} from 'react-native';
 import Notification from '../components/Notification';
-import notificaciones from '../data/notificaciones.json';
+import MyData from '../data/MyData';
 import BackIcon from '../assets/imgs/back.svg'; // Icono personalizado de regreso
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
@@ -20,7 +20,7 @@ const NotificationScreen = () => {
         <Text style={styles.title}>Activity</Text>
       </View>
       <FlatList
-        data={notificaciones}
+        data={MyData.notificaciones}
         renderItem={({item}) => <Notification item={item} />}
         keyExtractor={item => item.id}
         ItemSeparatorComponent={() => <View style={styles.separator} />}

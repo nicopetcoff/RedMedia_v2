@@ -1,8 +1,8 @@
 // src/context/AuthContext.js
 import React, {useState, useEffect, useContext} from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {signIn as signInAPI} from '../controller/miApp.controller';
 import {Alert} from 'react-native';
+import * as SecureStore from 'expo-secure-store';
 
 // Crear el contexto
 const AuthContext = React.createContext();
@@ -24,11 +24,11 @@ export const AuthProvider = ({children}) => {
     isAuthenticated: false,
   });
 
-  // Restaurar token de AsyncStorage al cargar la aplicación
+  // Restaurar token de SecureStore al cargar la aplicación
   useEffect(() => {
     const fetchData = async () => {
-      const token = await AsyncStorage.getItem('token');
-      const user = JSON.parse(await AsyncStorage.getItem('user'));
+      const token = await SecureStore.getItemAsync('token');
+      const user = JSON.parse(await SecureStore.getItemAsync('user'));
 
       if (token && user) {
         setAuthState({
@@ -41,14 +41,14 @@ export const AuthProvider = ({children}) => {
     fetchData();
   }, []);
 
-  // Función para iniciar sesión y guardar datos en AsyncStorage
+  // Función para iniciar sesión y guardar datos en SecureStore
   const login = userData => {
     const fetchData = async () => {
       try {
         const response = await signInAPI(userData);
         if (response.token) {
-          AsyncStorage.setItem('token', response.token);
-          AsyncStorage.setItem('user', JSON.stringify(userData.email));
+          SecureStore.setItemAsync('token', response.token);
+          SecureStore.setItemAsync('user', JSON.stringify(userData.email));
           
         } else {
           Alert.alert('Error', 'Login failed, please try again.');
@@ -67,10 +67,10 @@ export const AuthProvider = ({children}) => {
     });
   };
 
-  // Función para cerrar sesión y limpiar AsyncStorage
+  // Función para cerrar sesión y limpiar SecureStore
   const signOut = () => {
-    AsyncStorage.removeItem('token');
-    AsyncStorage.removeItem('user');
+    SecureStore.deleteItemAsync('token');
+    SecureStore.deleteItemAsync('user');
     setAuthState({
       user: null,
       token: null,
@@ -80,7 +80,7 @@ export const AuthProvider = ({children}) => {
 
   // Función para restaurar el token y validar la autenticación
   const restoreToken = token => {
-    const user = JSON.parse(AsyncStorage.getItem('user'));
+    const user = JSON.parse(SecureStore.getItemAsync('user'));
 
     if (token && user) {
       setAuthState({

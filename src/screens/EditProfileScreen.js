@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
 import { useToggleContext } from '../context/AuthProvider';
 
-const EditProfileScreen = ({ navigation }) => {
+const EditProfileScreen = ({ navigation ,route}) => {
+  const { avatar } = route.params;
   const { signOut } = useToggleContext();
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
