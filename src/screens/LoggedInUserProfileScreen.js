@@ -9,21 +9,19 @@ import MyProfileHeader from "../components/MyProfileHeader";
 import Post from "../components/Post";
 import { useFocusEffect } from "@react-navigation/native";
 import { getPosts, getUserData } from "../controller/miApp.controller";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUserContext } from "../context/AuthProvider"; // Importa el contexto de usuario
 
 const LoggedInUserProfileScreen = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
-  
-  
-  
+
+  const { token } = useUserContext(); // Obtén el token desde el contexto
 
   const fetchUserData = async () => {
     try {
-      const token= await AsyncStorage.getItem('token');
       const data = await getUserData(token);
-      setUserData(data.data); // Guardar solo la sección 'data'
+      setUserData(data.data); // Guarda solo la sección 'data'
     } catch (error) {
       console.error("Error loading user data", error);
     }
@@ -46,7 +44,7 @@ const LoggedInUserProfileScreen = () => {
   useFocusEffect(
     useCallback(() => {
       fetchUserData();
-    }, [])
+    }, [token]) // Agrega el token como dependencia
   );
 
   useEffect(() => {
