@@ -117,6 +117,7 @@ export const getUserData = async (token) => {
   let url = urlWebServices.getProfile; // URL para el endpoint de perfil
   try {
     console.log("Sending request to:", url); // Muestra la URL del endpoint
+    console.log("Using token:", token); // Muestra el token que se envía
 
     const response = await fetch(url, {
       method: "GET",
@@ -126,11 +127,14 @@ export const getUserData = async (token) => {
       },
     });
 
+    console.log("Response status:", response.status); // Muestra el código de estado de la respuesta
+
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
     const data = await response.json();
+    console.log("Received data:", data); // Muestra los datos recibidos
 
     return data; // Retorna los datos del usuario
   } catch (error) {
