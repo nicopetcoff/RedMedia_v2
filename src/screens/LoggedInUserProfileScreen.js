@@ -7,23 +7,23 @@ import {
 } from "react-native";
 import MyProfileHeader from "../components/MyProfileHeader";
 import Post from "../components/Post";
-import { useFocusEffect } from "@react-navigation/native";
 import { getPosts, getUserData } from "../controller/miApp.controller";
-import { useUserContext } from "../context/AuthProvider"; // Importa el contexto de usuario
+import { useUserContext } from "../context/AuthProvider";
+import { useFocusEffect } from "@react-navigation/native";
 
 const LoggedInUserProfileScreen = () => {
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState(null);
 
-  const { token } = useUserContext(); // Obtén el token desde el contexto
+  const { token } = useUserContext();
 
   const fetchUserData = async () => {
     try {
       const data = await getUserData(token);
-      setUserData(data.data); // Guarda solo la sección 'data'
+      setUserData(data.data);
     } catch (error) {
-      console.error("Error loading user data", error);
+      // Manejo silencioso de errores
     }
   };
 
@@ -32,19 +32,22 @@ const LoggedInUserProfileScreen = () => {
     try {
       const data = await getPosts();
       const filteredPosts = data.data.filter(
-        (post) => post.user === userData?.usernickname // Asegúrate de que userData esté definido
+        (post) => post.user === userData?.usernickname
       );
       setUserPosts(filteredPosts);
     } catch (error) {
-      console.error("Error loading posts", error);
+      // Manejo silencioso de errores
     }
     setLoading(false);
   };
 
+  // Ejecuta fetchUserData y fetchUserPosts cada vez que la pantalla recibe foco
   useFocusEffect(
     useCallback(() => {
-      fetchUserData();
-    }, [token]) // Agrega el token como dependencia
+      if (token) {
+        fetchUserData();
+      }
+    }, [token])
   );
 
   useEffect(() => {
@@ -69,11 +72,7 @@ const LoggedInUserProfileScreen = () => {
         keyExtractor={(item) => item._id.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}
-        ListHeaderComponent={
-          <>
-            <MyProfileHeader userData={userData} />
-          </>
-        }
+        ListHeaderComponent={<MyProfileHeader userData={userData} />}
         showsVerticalScrollIndicator={false}
       />
     </View>

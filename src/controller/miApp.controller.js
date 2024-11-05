@@ -17,9 +17,8 @@ export const getPosts = async function () {
     }
 
     let data = await response.json();
-    return data;  // Aquí debería devolver los datos del backend.
+    return data;
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
@@ -49,15 +48,13 @@ export const signUp = async (userData) => {
 
     let data = await response.json();
     return data;
-
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
 
 export const signIn = async (userData) => {
-  let url = urlWebServices.signIn;  // URL para el endpoint de inicio de sesión
+  let url = urlWebServices.signIn;
 
   try {
     let response = await fetch(url, {
@@ -78,14 +75,11 @@ export const signIn = async (userData) => {
 
     let data = await response.json();
     return data;
-
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
 
-// Función nueva añadida
 export const sendPasswordResetEmail = async (email) => {
   let url = urlWebServices.passwordReset;
 
@@ -105,61 +99,49 @@ export const sendPasswordResetEmail = async (email) => {
 
     let data = await response.json();
     return data;
-
   } catch (error) {
-    console.error("Error al enviar el correo de recuperación:", error);
     throw error;
   }
 };
 
-// Función user/me
 export const getUserData = async (token) => {
-  let url = urlWebServices.getProfile; // URL para el endpoint de perfil
-  try {
-    console.log("Sending request to:", url); // Muestra la URL del endpoint
-    console.log("Using token:", token); // Muestra el token que se envía
+  let url = urlWebServices.getProfile;
 
+  try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "x-access-token": token, // Enviar el token en los headers
+        "x-access-token": token,
       },
     });
-
-    console.log("Response status:", response.status); // Muestra el código de estado de la respuesta
 
     if (!response.ok) {
       throw new Error(`Error: ${response.statusText}`);
     }
 
     const data = await response.json();
-    console.log("Received data:", data); // Muestra los datos recibidos
-
-    return data; // Retorna los datos del usuario
+    return data;
   } catch (error) {
-    console.error("Error fetching user data:", error); // Manejo de errores
-    throw error; // Propaga el error
+    throw error;
   }
 };
 
 export const updateProfileImage = async (imageUri, token) => {
   const formData = new FormData();
-  
-  // Cambia 'avatar' a lo que espera tu backend si es necesario
   formData.append('avatar', {
     uri: imageUri,
-    type: 'image/jpeg', // Ajusta el tipo si es necesario (image/png para PNG)
-    name: 'profile.jpg', // El nombre que desees
+    type: 'image/jpeg',
+    name: 'profile.jpg',
   });
 
   try {
-    const response = await fetch(`${urlWebServices.updateProfileImage}`, { // Asegúrate de que la URL sea correcta
+    const response = await fetch(`${urlWebServices.updateProfileImage}`, {
       method: 'POST',
       body: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
-        'x-access-token': token, // Agrega el token aquí
+        'x-access-token': token,
       },
     });
 
@@ -168,11 +150,8 @@ export const updateProfileImage = async (imageUri, token) => {
     }
 
     const data = await response.json();
-    console.log('Imagen de perfil actualizada:', data);
-    return data; // Devuelve los datos que necesites del backend
+    return data;
   } catch (error) {
-    console.error('Error al enviar la imagen:', error);
-    throw error; // Propaga el error
+    throw error;
   }
 };
-
