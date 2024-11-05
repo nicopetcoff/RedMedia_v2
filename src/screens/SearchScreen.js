@@ -40,7 +40,7 @@ const SearchScreen = () => {
       {/* Encabezado con botón de retroceso */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <BackIcon width={24} height={24} fill="#000" />
+          <BackIcon width={24} height={24} fill="none" />
         </TouchableOpacity>
       </View>
 
