@@ -21,6 +21,7 @@ const LoggedInUserProfileScreen = () => {
   const fetchUserData = async () => {
     try {
       const data = await getUserData(token);
+      console.log("Datos de usuario obtenidos:", data.data); // Agrega log para revisar los datos del usuario
       setUserData(data.data);
     } catch (error) {
       // Manejo silencioso de errores

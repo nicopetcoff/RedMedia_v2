@@ -2,8 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { signIn as signInAPI } from '../controller/miApp.controller';
 import { Alert } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { auth } from '../../firebaseConfig'; // Asegúrate de que la ruta sea correcta
-import {signInWithEmailAndPassword} from 'firebase/auth';
+import { auth } from '../../firebaseConfig';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const AuthContext = React.createContext();
 const toggleContext = React.createContext();
@@ -52,20 +52,15 @@ export const AuthProvider = ({ children }) => {
       // Inicia sesión en Firebase con el correo y contraseña
       const firebaseUser = await signInWithEmailAndPassword(auth, userData.email, userData.password);
       const firebaseToken = await firebaseUser.user.getIdToken();
-  
-      console.log("Token de Firebase obtenido:", firebaseToken); // Verificar que el token de Firebase se obtuvo
-  
+
       // Enviar el token y el email al backend para autenticación
       const response = await signInAPI({ email: userData.email, token: firebaseToken });
-      
-      // Confirmar la respuesta del backend
-      console.log("Respuesta del backend:", response);
   
       if (response.token) {
         const user = response.user || { email: userData.email };
         const userString = JSON.stringify(user);
   
-        await SecureStore.setItemAsync('token', String(response.token)); // token del backend
+        await SecureStore.setItemAsync('token', String(response.token));
         await SecureStore.setItemAsync('user', userString);
   
         setAuthState({
@@ -77,7 +72,6 @@ export const AuthProvider = ({ children }) => {
         Alert.alert('Error', 'Inicio de sesión fallido. Por favor, inténtalo de nuevo.');
       }
     } catch (error) {
-      console.error('Error durante el inicio de sesión:', error);
       Alert.alert('Error', 'Hubo un problema durante el inicio de sesión.');
     }
   };
