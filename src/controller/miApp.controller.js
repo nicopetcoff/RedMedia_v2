@@ -54,28 +54,34 @@ export const signUp = async (userData) => {
 };
 
 export const signIn = async (userData) => {
-  let url = urlWebServices.signIn;
+  const { email, token } = userData;
+
+  console.log("Datos de inicio de sesión enviados al backend:", { email, firebaseToken: token });
 
   try {
-    let response = await fetch(url, {
+    const response = await fetch(urlWebServices.signIn, {
       method: "POST",
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
       },
       body: JSON.stringify({
-        email: userData.email,
-        password: userData.password,
+        email,
+        firebaseToken: token, // Aquí usamos `firebaseToken` para que el backend lo reciba con el mismo nombre
       }),
     });
 
     if (!response.ok) {
-      throw new Error("Error al iniciar sesión: " + response.status);
+      const errorData = await response.json();
+      throw new Error(errorData.message || `Error: ${response.status}`);
     }
 
-    let data = await response.json();
+    const data = await response.json();
+    console.log("Datos recibidos del backend:", data); // Log para verificar datos
     return data;
+
   } catch (error) {
+    console.error("Error durante el inicio de sesión:", error);
     throw error;
   }
 };

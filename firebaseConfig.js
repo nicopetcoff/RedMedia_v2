@@ -1,8 +1,8 @@
 // firebaseConfig.js
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth"; // Importa el módulo de autenticación
+import { getAuth } from "firebase/auth";
 
-// Configuración de Firebase proporcionada
+// Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyA6fCLbVBpM3J1ipGK3ywI6kS_rFyFG0p8",
   authDomain: "redmedia-aef35.firebaseapp.com",
@@ -12,10 +12,7 @@ const firebaseConfig = {
   appId: "1:897370499655:web:cea045f88a1fa8bde11f62",
 };
 
-// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
-// Exporta la instancia de autenticación para uso en el restablecimiento de contraseña
-export const auth = getAuth(app);
-
-export default app;
+export { app, auth };
