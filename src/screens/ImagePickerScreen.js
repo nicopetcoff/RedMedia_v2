@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, FlatList, ScrollView, PermissionsAndroid, Platform, Alert} from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, FlatList, ScrollView, PermissionsAndroid, Platform, Alert } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import * as ImagePicker from 'expo-image-picker'; // Asegúrate de usar la librería correcta
 import * as Location from 'expo-location'; // Usar para obtener la ubicación
-import Geolocation from 'react-native-geolocation-service';
 import Geocoder from 'react-native-geocoding';
 import { publishPost } from '../controller/miApp.controller';
+import { getUserData } from "../controller/miApp.controller";
+import { useUserContext } from "../context/AuthProvider";
+import { useFocusEffect } from "@react-navigation/native";
 
 Geocoder.init('AIzaSyAWjptknqVfMwmLDOiN5sBOoP5Rx2sxiSc');
 
@@ -15,6 +17,26 @@ const ImagePickerScreen = () => {
   const [description, setDescription] = useState('');
   const [location, setLocation] = useState('Loading current location...');
   const [selectedLocation, setSelectedLocation] = useState('');
+  const [userData, setUserData] = useState(null);
+
+  const { token } = useUserContext();
+
+  const fetchUserData = async () => {
+    try {
+      const data = await getUserData(token);
+      setUserData(data.data);
+    } catch (error) {
+      // Manejo silencioso de errores
+    }
+  };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (token) {
+        fetchUserData();
+      }
+    }, [token])
+  );
 
   useEffect(() => {
     const getCurrentLocation = async () => {
@@ -59,14 +81,12 @@ const ImagePickerScreen = () => {
   }, []);
 
   const openGallery = async () => {
-    // Verifica permisos de acceso a la galería de imágenes
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       alert('Permission to access gallery is required!');
       return;
     }
 
-    // Verifica si ya se alcanzó el límite de 10 imágenes
     if (selectedImages.length >= 10) {
       alert('You can only add up to 10 images.');
       return;
@@ -74,13 +94,13 @@ const ImagePickerScreen = () => {
 
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsMultipleSelection: true, // Asegura que se puedan seleccionar múltiples imágenes
+      allowsMultipleSelection: true,
       selectionLimit: 10 - selectedImages.length,
     });
 
     if (!result.cancelled) {
       const newImages = result.assets.map(asset => ({ id: asset.uri, uri: asset.uri }));
-      const totalImages = [...selectedImages, ...newImages].slice(0, 10);  // Limitar a 10 imágenes
+      const totalImages = [...selectedImages, ...newImages].slice(0, 10);
       setSelectedImages(totalImages);
     }
   };
@@ -102,7 +122,7 @@ const ImagePickerScreen = () => {
       images: selectedImages.map(image => image.uri),
     };
 
-    const result = await publishPost(postData);  // Se llama a publishPost desde el controlador
+    const result = await publishPost(postData);
 
     if (result.success) {
       Alert.alert('Success', result.message);
@@ -120,8 +140,11 @@ const ImagePickerScreen = () => {
         </TouchableOpacity>
       </View>
       <View style={styles.profileContainer}>
-        <Image source={{ uri: 'https://plus.unsplash.com/premium_photo-1689977968861-9c91dbb16049?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8Zm90byUyMGRlJTIwcGVyZmlsfGVufDB8fDB8fHww' }} style={styles.profileImage} />
-        <Text style={styles.username}>@juan_perez</Text>
+        <Image
+          source={{ uri: userData?.avatar || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_640.png' }}
+          style={styles.profileImage}
+        />
+        <Text style={styles.username}>@{userData?.usernickname || 'Loading...'}</Text>
       </View>
       <View>
         <TouchableOpacity onPress={openGallery} style={styles.selectButton}>
