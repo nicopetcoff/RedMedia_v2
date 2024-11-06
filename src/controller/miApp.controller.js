@@ -82,6 +82,7 @@ export const signIn = async (userData) => {
 
 export const sendPasswordResetEmail = async (email) => {
   let url = urlWebServices.passwordReset;
+  console.log("Enviando solicitud de restablecimiento a URL:", url);
 
   try {
     let response = await fetch(url, {
@@ -94,12 +95,21 @@ export const sendPasswordResetEmail = async (email) => {
     });
 
     if (!response.ok) {
+      console.log("Código de estado:", response.status, "Texto de estado:", response.statusText);
       throw new Error("Error al enviar el correo de recuperación: " + response.status);
     }
 
-    let data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (error) {
+      console.error("Error al parsear JSON:", error);
+      throw new Error("La respuesta no es JSON válida.");
+    }
+
     return data;
   } catch (error) {
+    console.error("Error en sendPasswordResetEmail:", error.message);
     throw error;
   }
 };

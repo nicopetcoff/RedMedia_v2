@@ -15,17 +15,21 @@ const ForgotPasswordScreen = ({ navigation }) => {
       Alert.alert('Invalid Email', 'Please enter a valid email address.');
       return;
     }
-
+  
+    console.log("Email ingresado para restablecimiento:", email); // Verifica que el correo se pase correctamente
+  
     try {
       const response = await sendPasswordResetEmail(email);
-
+  
+      console.log("Respuesta del backend:", response); // Muestra la respuesta del backend
+  
       if (response.message === 'Correo enviado con éxito') {
         Alert.alert('Success', 'Instructions to reset your password have been sent.');
       } else {
         Alert.alert('Error', 'Failed to send password reset instructions. Please try again.');
       }
     } catch (error) {
-      console.error('Error sending password reset email:', error);
+      console.error('Error sending password reset email:', error); // Muestra el error en la consola
       Alert.alert('Error', 'An error occurred while sending the email. Please try again.');
     }
   };
