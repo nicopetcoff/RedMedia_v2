@@ -1,36 +1,50 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
 import Post from '../components/Post';
-import { getPosts } from '../controller/miApp.controller'; // Asegúrate de importar correctamente la función
-import { useNavigation } from '@react-navigation/native'; // Importamos el hook de navegación
+import { getPosts, getUserData } from "../controller/miApp.controller";
+import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
+import { useUserContext } from '../context/AuthProvider';
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigation = useNavigation(); // Obtenemos el objeto de navegación
+  const [userData, setUserData] = useState(null); // Estado para almacenar datos de usuario
+  const navigation = useNavigation();
+  const { token } = useUserContext(); // Obtener el token de usuario autenticado
 
-  // Función para obtener los posts
-  const fetchPosts = async () => {
-    setLoading(true); // Mostrar el spinner mientras cargan los posts
+  // Obtener datos del usuario al cargar la pantalla
+  const fetchUserData = async () => {
     try {
-      const data = await getPosts(); // Llamada a la función para obtener los posts
-      setPosts(data.data); // Asegúrate de acceder al campo 'data' de la respuesta
+      const data = await getUserData(token); // Obtener datos del usuario usando el token
+      setUserData(data.data);
+      
+    } catch (error) {
+      
+    }
+  };
+
+  // Obtener posts desde el backend
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const data = await getPosts();
+      setPosts(data.data);
     } catch (error) {
       console.error("Error al cargar los posts", error);
     }
-    setLoading(false); // Ocultar el spinner cuando termine la carga
+    setLoading(false);
   };
 
   useEffect(() => {
-    fetchPosts(); // Cargar los posts cuando la pantalla se monte
+    fetchUserData(); // Cargar los datos de usuario al inicio
+    fetchPosts(); // Cargar los posts al inicio
 
     const unsubscribe = navigation.addListener('focus', () => {
-      // Vuelve a cargar los posts cada vez que la pantalla "Home" sea enfocada
       fetchPosts();
     });
 
-    return unsubscribe; // Limpiar el listener cuando el componente se desmonte
+    return unsubscribe;
   }, [navigation]);
 
   if (loading) {
@@ -48,12 +62,22 @@ const HomeScreen = () => {
         <Text style={styles.header}>REDMEDIA</Text>
       </View>
       <FlatList
-        data={posts}  // Usamos los posts obtenidos del backend
-        renderItem={({ item }) => <Post item={item} />}
+        data={posts}
+        renderItem={({ item }) => {
+          const isOwnPost = userData?.usernickname === item.user;
+          return (
+            <Post
+              item={item}
+              isOwnPost={isOwnPost}
+              onPress={() => navigation.navigate('PostDetail', { item, userData })}
+            />
+          );
+        }}
         keyExtractor={(item) => item._id}
         numColumns={2}
         columnWrapperStyle={styles.row}
-        showsVerticalScrollIndicator={false} // Ocultar el indicador de scroll vertical
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.flatListContent}
       />
     </View>
   );
@@ -63,13 +87,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    paddingHorizontal: 10,
     paddingTop: Constants.statusBarHeight,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 20,
+    paddingHorizontal: 15,
   },
   logo: {
     width: 40,
@@ -84,6 +108,8 @@ const styles = StyleSheet.create({
   },
   row: {
     justifyContent: 'space-between',
+  },
+  flatListContent: {
     paddingHorizontal: 10,
   },
   loaderContainer: {

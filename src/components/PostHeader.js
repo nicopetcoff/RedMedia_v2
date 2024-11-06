@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const PostHeader = ({ userAvatar, user, isFollowing, setIsFollowing }) => {
+const PostHeader = ({ userAvatar, user, isFollowing, setIsFollowing, showFollowButton = true }) => {
   return (
     <View style={styles.headerContainer}>
       <View style={styles.headerLeft}>
@@ -14,14 +14,16 @@ const PostHeader = ({ userAvatar, user, isFollowing, setIsFollowing }) => {
           </View>
         )}
       </View>
-      <TouchableOpacity
-        style={styles.followButton}
-        onPress={() => setIsFollowing(!isFollowing)}
-      >
-        <Text style={styles.followButtonText}>
-          {isFollowing ? 'Unfollow' : 'Follow'}
-        </Text>
-      </TouchableOpacity>
+      {showFollowButton && (
+        <TouchableOpacity
+          style={styles.followButton}
+          onPress={() => setIsFollowing(!isFollowing)}
+        >
+          <Text style={styles.followButtonText}>
+            {isFollowing ? 'Unfollow' : 'Follow'}
+          </Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

@@ -1,3 +1,4 @@
+// PostDetail.js
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import PostHeader from '../components/PostHeader';
@@ -7,7 +8,8 @@ import PostComments from '../components/PostComments';
 import LocationIcon from '../assets/imgs/location.svg';
 
 const PostDetail = ({ route, navigation }) => {
-  const { item } = route.params || {};
+  const { item, userData } = route.params || {};
+
 
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -22,16 +24,19 @@ const PostDetail = ({ route, navigation }) => {
     return null;
   }
 
+  const isOwnPost = userData?.usernickname === item.user;
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('Profile', { username: item.user })}
+        onPress={() => !isOwnPost && navigation.navigate('Profile', { username: item.user })}
       >
         <PostHeader
-          userAvatar={item.userAvatar}
+          userAvatar={isOwnPost ? userData.avatar : item.userAvatar}
           user={item.user}
           isFollowing={isFollowing}
           setIsFollowing={setIsFollowing}
+          showFollowButton={!isOwnPost} // Oculta el botón de "Follow" si es el propio usuario
         />
       </TouchableOpacity>
       

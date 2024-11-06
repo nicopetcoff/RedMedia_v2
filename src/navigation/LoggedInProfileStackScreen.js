@@ -15,7 +15,7 @@ const LoggedInProfileStackScreen = () => {
       <Stack.Screen
         name="LoggedInUserProfile"
         component={LoggedInUserProfileScreen}
-        options={{ headerShown: false }} // Oculta el encabezado para la pantalla de perfil
+        options={{ headerShown: false }} 
       />
       <Stack.Screen
         name="PostDetail"

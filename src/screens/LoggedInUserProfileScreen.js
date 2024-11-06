@@ -1,3 +1,4 @@
+// LoggedInUserProfileScreen.js
 import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
@@ -9,7 +10,7 @@ import MyProfileHeader from "../components/MyProfileHeader";
 import Post from "../components/Post";
 import { getPosts, getUserData } from "../controller/miApp.controller";
 import { useUserContext } from "../context/AuthProvider";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 
 const LoggedInUserProfileScreen = () => {
   const [userPosts, setUserPosts] = useState([]);
@@ -17,11 +18,11 @@ const LoggedInUserProfileScreen = () => {
   const [userData, setUserData] = useState(null);
 
   const { token } = useUserContext();
+  const navigation = useNavigation();
 
   const fetchUserData = async () => {
     try {
       const data = await getUserData(token);
-      console.log("Datos de usuario obtenidos:", data.data); // Agrega log para revisar los datos del usuario
       setUserData(data.data);
     } catch (error) {
       // Manejo silencioso de errores
@@ -42,7 +43,6 @@ const LoggedInUserProfileScreen = () => {
     setLoading(false);
   };
 
-  // Ejecuta fetchUserData y fetchUserPosts cada vez que la pantalla recibe foco
   useFocusEffect(
     useCallback(() => {
       if (token) {
@@ -69,7 +69,15 @@ const LoggedInUserProfileScreen = () => {
     <View style={styles.container}>
       <FlatList
         data={userPosts}
-        renderItem={({ item }) => <Post item={item} />}
+        renderItem={({ item }) => (
+          <Post
+            item={item}
+            userData={userData} // Pasar userData directamente como prop
+            onPress={() =>
+              navigation.navigate('PostDetail', { item, userData })
+            }
+          />
+        )}
         keyExtractor={(item) => item._id.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}

@@ -1,15 +1,12 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 
-const Post = ({ item }) => {
-  const navigation = useNavigation();
+const Post = ({ item, isOwnPost, onPress }) => {
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
   return (
-    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('PostDetail', { item })}>
+    <TouchableOpacity style={styles.card} onPress={onPress}>
       <Image source={{ uri: imageUri }} style={styles.image} />
-
       <View style={styles.infoContainer}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.user}>@{item.user}</Text>
@@ -21,8 +18,8 @@ const Post = ({ item }) => {
 const styles = StyleSheet.create({
   card: {
     marginVertical: 5,
-    marginHorizontal: 5,
-    width: Dimensions.get('window').width / 2 - 15, // Fijar ancho para alineación uniforme
+    marginHorizontal: 4,
+    width: Dimensions.get('window').width / 2 - 18,
     borderRadius: 10,
     overflow: 'hidden',
   },
@@ -33,10 +30,10 @@ const styles = StyleSheet.create({
     resizeMode: 'cover',
   },
   infoContainer: {
-    paddingHorizontal: 8, // Agregar padding para separación
+    paddingHorizontal: 8,
     paddingVertical: 5,
-    alignItems: 'flex-start', // Mantener el texto alineado a la izquierda
-    width: '100%', // Asegura que ocupe el ancho completo del contenedor
+    alignItems: 'flex-start',
+    width: '100%',
   },
   title: {
     fontSize: 14,
