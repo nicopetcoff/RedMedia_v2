@@ -4,6 +4,8 @@ import {
   StyleSheet,
   FlatList,
   ActivityIndicator,
+  RefreshControl,
+  Dimensions,
 } from "react-native";
 import MyProfileHeader from "../components/MyProfileHeader";
 import Post from "../components/Post";
@@ -11,24 +13,30 @@ import { getPosts, getUserData } from "../controller/miApp.controller";
 import { useUserContext } from "../context/AuthProvider";
 import { useFocusEffect } from "@react-navigation/native";
 
+const { width } = Dimensions.get('window');
+const COLUMN_WIDTH = (width - 30) / 2;
+
 const LoggedInUserProfileScreen = () => {
+  // 1. Todos los useState juntos al principio
   const [userPosts, setUserPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [userData, setUserData] = useState(null);
 
+  // 2. useContext después de useState
   const { token } = useUserContext();
 
-  const fetchUserData = async () => {
+  // 3. Definir todas las funciones con useCallback juntas
+  const fetchUserData = useCallback(async () => {
     try {
       const data = await getUserData(token);
       setUserData(data.data);
     } catch (error) {
-      // Manejo silencioso de errores
+      console.error('Error al obtener datos del usuario:', error);
     }
-  };
+  }, [token]);
 
-  const fetchUserPosts = async () => {
-    setLoading(true);
+  const fetchUserPosts = useCallback(async () => {
     try {
       const data = await getPosts();
       const filteredPosts = data.data.filter(
@@ -36,30 +44,51 @@ const LoggedInUserProfileScreen = () => {
       );
       setUserPosts(filteredPosts);
     } catch (error) {
-      // Manejo silencioso de errores
+      console.error('Error al obtener posts:', error);
     }
-    setLoading(false);
-  };
+  }, [userData?.usernickname]);
 
-  // Ejecuta fetchUserData y fetchUserPosts cada vez que la pantalla recibe foco
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([fetchUserData(), userData && fetchUserPosts()]);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchUserData, fetchUserPosts, userData]);
+
+  const renderPost = useCallback(({ item }) => (
+    <View style={styles.postContainer}>
+      <Post item={item} />
+    </View>
+  ), []);
+
+  const renderHeader = useCallback(() => (
+    <MyProfileHeader userData={userData} />
+  ), [userData]);
+
+  // 4. useFocusEffect después de todas las definiciones de useCallback
   useFocusEffect(
     useCallback(() => {
       if (token) {
-        fetchUserData();
+        setLoading(true);
+        fetchUserData()
+          .finally(() => setLoading(false));
       }
-    }, [token])
+    }, [token, fetchUserData])
   );
 
+  // 5. useEffect al final
   useEffect(() => {
     if (userData) {
       fetchUserPosts();
     }
-  }, [userData]);
+  }, [userData, fetchUserPosts]);
 
   if (loading) {
     return (
       <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#1FA1FF" />
       </View>
     );
   }
@@ -68,12 +97,21 @@ const LoggedInUserProfileScreen = () => {
     <View style={styles.container}>
       <FlatList
         data={userPosts}
-        renderItem={({ item }) => <Post item={item} />}
+        renderItem={renderPost}
         keyExtractor={(item) => item._id.toString()}
         numColumns={2}
         columnWrapperStyle={styles.row}
-        ListHeaderComponent={<MyProfileHeader userData={userData} />}
+        ListHeaderComponent={renderHeader}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor="#1FA1FF"
+            colors={["#1FA1FF"]}
+          />
+        }
       />
     </View>
   );
@@ -81,17 +119,26 @@ const LoggedInUserProfileScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     backgroundColor: "#fff",
   },
+  contentContainer: {
+    flexGrow: 1,
+  },
   row: {
-    justifyContent: "space-between",
-    marginHorizontal: 10,
+    flexDirection: 'row',
+    paddingHorizontal: 15,
+    marginBottom: 15,
+  },
+  postContainer: {
+    flex: 1,
+    marginHorizontal: 5,
   },
   loaderContainer: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
 
