@@ -110,7 +110,7 @@ const ImagePickerScreen = () => {
   };
 
   const handlePush = async () => {
-    if (!title || !description || selectedImages.length === 0) {
+    if (!title || selectedImages.length === 0) {
       Alert.alert('Error', 'Please fill all fields and select at least one image');
       return;
     }
@@ -120,6 +120,8 @@ const ImagePickerScreen = () => {
       description,
       location: selectedLocation || location,
       images: selectedImages.map(image => image.uri),
+      user: postData.nickname,
+      userAvatar: postData.avatar,
     };
 
     const result = await publishPost(postData);
@@ -193,7 +195,7 @@ const ImagePickerScreen = () => {
           onValueChange={(itemValue) => setSelectedLocation(itemValue)}
         >
           <Picker.Item label={location} value={location} style={styles.input} />
-          <Picker.Item label="Quilmes" value="change" style={styles.input}/>
+          <Picker.Item label="Quilmes" value="Quilmes" style={styles.input}/>
         </Picker>
       </View>
     </ScrollView>
@@ -216,11 +218,12 @@ const styles = StyleSheet.create({
   publishText: {
     color: '#007AFF',
     fontSize: 16,
+    marginTop: 50,
   },
   textTitles: {
     color: "#000000",
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 5,
     fontSize: 18,
   },
   profileContainer: {
@@ -275,7 +278,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   inputContainer: {
-    marginTop: 20,
+    marginTop: 0,
   },
   input: {
     width: '100%',
