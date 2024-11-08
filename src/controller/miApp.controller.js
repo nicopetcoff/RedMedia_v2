@@ -155,3 +155,24 @@ export const updateProfileImage = async (imageUri, token) => {
     throw error;
   }
 };
+
+export const publishPost = async (postData) => {
+  try {
+    console.log("Post Data", postData)
+    let url = urlWebServices.postPost;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-access-token': token, },
+      body: JSON.stringify(postData),
+    });
+
+    if (response.ok) {
+      return { success: true, message: 'Post published successfully' };
+    } else {
+      return { success: false, message: 'Failed to publish post' };
+    }
+  } catch (error) {
+    console.error('Error publishing post:', error);
+    return { success: false, message: 'Failed to connect to backend' };
+  }
+};
