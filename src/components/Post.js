@@ -1,30 +1,22 @@
-import React from 'react';
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React from "react";
+import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 
 const Post = ({ item }) => {
   const navigation = useNavigation();
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
   return (
-    <TouchableOpacity 
-      onPress={() => navigation.navigate('PostDetail', { item })}
+    <TouchableOpacity
+      onPress={() => navigation.navigate("PostDetail", { item })}
       style={styles.container}
     >
-      <Image 
-        source={{ uri: imageUri }} 
-        style={styles.image} 
-      />
+      <Image source={{ uri: imageUri }} style={styles.image} />
       <View style={styles.textContainer}>
-        <Text 
-          style={styles.title}
-          numberOfLines={2}
-        >
+        <Text style={styles.title} numberOfLines={2}>
           {item.title}
         </Text>
-        <Text style={styles.username}>
-          {item.user}
-        </Text>
+        <Text style={styles.username}>@{item.user}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -33,12 +25,12 @@ const Post = ({ item }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     marginBottom: 2,
   },
   image: {
     aspectRatio: 1,
-    width: '100%',
+    width: "100%",
     borderRadius: 12,
   },
   textContainer: {
@@ -48,15 +40,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 13,
-    fontWeight: 'bold',
-    color: '#000',
+    fontWeight: "bold",
+    color: "#000",
     marginBottom: 2,
-    fontFamily: 'Roboto',
+    fontFamily: "Roboto",
   },
   username: {
     fontSize: 12,
-    color: '#657786',
-    fontFamily: 'Roboto',
+    color: "#657786",
+    fontFamily: "Roboto",
   },
 });
 

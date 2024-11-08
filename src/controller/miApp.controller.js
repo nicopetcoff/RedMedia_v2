@@ -156,23 +156,61 @@ export const updateProfileImage = async (imageUri, token) => {
   }
 };
 
-export const publishPost = async (postData) => {
+export const publishPost = async (postData, token) => {
   try {
-    console.log("Post Data", postData)
     let url = urlWebServices.postPost;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-access-token': token, },
-      body: JSON.stringify(postData),
+    
+    const formData = new FormData();
+    
+    // Agregar datos del post
+    formData.append('title', postData.title);
+    formData.append('description', postData.description);
+    formData.append('location', postData.location);
+    formData.append('user', postData.user);
+    formData.append('userAvatar', postData.userAvatar);
+
+    // Agregar imágenes
+    postData.images.forEach((imageUri, index) => {
+      let localUri = imageUri;
+      let filename = localUri.split('/').pop();
+
+      // Extraer la extensión del archivo
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image/jpeg`;
+
+      formData.append('images', {
+        uri: localUri,
+        name: filename,
+        type
+      });
     });
 
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'x-access-token': token
+      },
+      body: formData
+    });
+
+    const responseData = await response.json();
+
     if (response.ok) {
-      return { success: true, message: 'Post published successfully' };
+      return { 
+        success: true, 
+        message: 'Post published successfully', 
+        data: responseData.data 
+      };
     } else {
-      return { success: false, message: 'Failed to publish post' };
+      throw new Error(responseData.message || 'Failed to publish post');
     }
   } catch (error) {
-    console.error('Error publishing post:', error);
-    return { success: false, message: 'Failed to connect to backend' };
+    console.error('Error en publishPost:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Error connecting to server'
+    };
   }
 };

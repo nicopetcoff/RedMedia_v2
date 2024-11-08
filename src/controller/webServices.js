@@ -14,6 +14,7 @@ const urlWebServices = {
   getNotifications: urlApi + "api/users/notificaciones", // Ruta para obtener las notificaciones
   getProfile: urlApi + "api/users/me", // Ruta para obtener el perfil del usuario
   updateProfileImage: urlApi + "api/users/updateProfileImage", // Ruta para actualizar el perfil del usuario
+  postPost: urlApi + "api/posts/crear", // Ruta para publicar un post
 };
 
 export default urlWebServices;
