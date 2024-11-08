@@ -12,35 +12,43 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   const handleSendInstructions = async () => {
     if (!isValidEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      Alert.alert('Error', 'Por favor ingresa un email válido');
       return;
     }
 
     try {
       const response = await sendPasswordResetEmail(email);
-
-      if (response.message === 'Correo enviado con éxito') {
-        Alert.alert('Success', 'Instructions to reset your password have been sent.');
+      
+      if (response.status === 200) {
+        Alert.alert(
+          'Éxito',
+          'Se ha enviado una nueva contraseña a tu email',
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate('Login')
+            }
+          ]
+        );
       } else {
-        Alert.alert('Error', 'Failed to send password reset instructions. Please try again.');
+        Alert.alert('Error', 'No se pudo enviar el email. Intenta nuevamente.');
       }
     } catch (error) {
-      console.error('Error sending password reset email:', error);
-      Alert.alert('Error', 'An error occurred while sending the email. Please try again.');
+      Alert.alert('Error', 'Ocurrió un error al procesar tu solicitud');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Forgot Password</Text>
-      <Text style={styles.subtitle}>Don't Worry I'll Help you</Text>
+      <Text style={styles.title}>¿Olvidaste tu contraseña?</Text>
+      <Text style={styles.subtitle}>No te preocupes, te ayudamos</Text>
       <Text style={styles.instructionText}>
-        Please enter your email address to reset your password
+        Por favor ingresa tu dirección de email para restablecer tu contraseña
       </Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Enter your email address"
+        placeholder="Ingresa tu email"
         placeholderTextColor="#aaa"
         value={email}
         onChangeText={setEmail}
@@ -48,8 +56,11 @@ const ForgotPasswordScreen = ({ navigation }) => {
         autoCapitalize="none"
       />
 
-      <TouchableOpacity style={styles.sendButton} onPress={handleSendInstructions}>
-        <Text style={styles.sendButtonText}>Send Instructions</Text>
+      <TouchableOpacity 
+        style={styles.sendButton} 
+        onPress={handleSendInstructions}
+      >
+        <Text style={styles.sendButtonText}>Enviar instrucciones</Text>
       </TouchableOpacity>
     </View>
   );
@@ -91,7 +102,7 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   sendButton: {
-    backgroundColor: '#4285F4',
+    backgroundColor: '#1DA1F2',
     paddingVertical: 12,
     paddingHorizontal: 40,
     borderRadius: 5,
