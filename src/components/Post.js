@@ -6,6 +6,8 @@ const Post = ({ item }) => {
   const navigation = useNavigation();
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
+  console.log("item en Post", item);
+
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate("PostDetail", { item })}
