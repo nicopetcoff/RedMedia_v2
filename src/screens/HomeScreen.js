@@ -1,36 +1,66 @@
-// HomeScreen.js
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
 import Post from '../components/Post';
-import { getPosts } from '../controller/miApp.controller';
+import { getPosts, getAds } from '../controller/miApp.controller';
 import { useNavigation } from '@react-navigation/native';
 import Constants from 'expo-constants';
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
+  const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation();
 
-  const fetchPosts = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const data = await getPosts();
-      setPosts(data.data);
+      const [postsResponse, adsResponse] = await Promise.all([
+        getPosts(),
+        getAds()
+      ]);
+      
+      setPosts(postsResponse.data);
+      setAds(adsResponse.data);
     } catch (error) {
-      console.error("Error al cargar los posts", error);
+      console.error("Error al cargar los datos", error);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchData();
 
-    const unsubscribe = navigation.addListener('focus', () => {
-      fetchPosts();
-    });
-
+    const unsubscribe = navigation.addListener('focus', fetchData);
     return unsubscribe;
   }, [navigation]);
+
+  const renderItem = ({ item, index }) => {
+    // Mostrar un anuncio cada 4 elementos (después de cada 3 posts)
+    if ((index + 1) % 4 === 0 && ads.length > 0) {
+      // Seleccionar un anuncio aleatorio
+      const randomAd = ads[Math.floor(Math.random() * ads.length)];
+      
+      return (
+        <TouchableOpacity 
+          style={styles.adContainer}
+          onPress={() => Linking.openURL(randomAd.Url)}
+        >
+          <Image
+            source={{ uri: randomAd.imagePath[0].landscape }}
+            style={styles.adImage}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
+      );
+    }
+
+    // Renderizar post normal
+    return (
+      <View style={styles.postContainer}>
+        <Post item={item} />
+      </View>
+    );
+  };
 
   if (loading) {
     return (
@@ -49,12 +79,8 @@ const HomeScreen = () => {
       
       <FlatList
         data={posts}
-        renderItem={({ item }) => (
-          <View style={styles.postContainer}>
-            <Post item={item} />
-          </View>
-        )}
-        keyExtractor={(item) => item._id}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => item._id || `ad-${index}`}
         numColumns={2}
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
@@ -79,8 +105,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#efefef',
   },
   logo: {
-    width: 28,
-    height: 28,
+    width: 50,
+    height: 50,
     marginRight: 8,
   },
   header: {
@@ -100,6 +126,19 @@ const styles = StyleSheet.create({
     flex: 1,
     marginHorizontal: 5,
     marginBottom: 15,
+  },
+  adContainer: {
+    flex: 1,
+    marginHorizontal: 5,
+    marginBottom: 15,
+    borderRadius: 10,
+    overflow: 'hidden',
+    height: 200, // Ajusta según necesites
+  },
+  adImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 10,
   },
   loaderContainer: {
     flex: 1,

@@ -214,3 +214,25 @@ export const publishPost = async (postData, token) => {
     };
   }
 };
+
+export const getAds = async () => {
+  let url = urlWebServices.getAds;
+
+  try {
+      const response = await fetch(url, {
+          method: "GET",
+          headers: {
+              Accept: "application/json",
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error("Error al obtener los anuncios: " + response.status);
+      }
+
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      throw error;
+  }
+};
