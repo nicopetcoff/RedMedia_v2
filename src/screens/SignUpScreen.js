@@ -11,24 +11,22 @@ import { signUp } from "../controller/miApp.controller"; // Importamos la funci�
 import { Formik } from "formik";
 import { signUpValidationSchema } from "../context/validationSchemas";
 import {FormikInputValue} from "../components/FormikInputValue";
+import { useNavigation } from '@react-navigation/native';
 
 const SignUpScreen = () => {
+  const navigation = useNavigation();
   // Función para validar los campos
   const handleSignUp = async (userData) => {
     // Preparar el objeto con los datos del usuario
-    
+    console.log(userData);
     try {
       // Llamar a la función signUp que enviará los datos al backend
       const response = await signUp(userData);
 
-      if (response.success) {
-        Alert.alert("Success", "User registered successfully!");
-      } else {
-        Alert.alert("Error", response.message || "Failed to sign up.");
-      }
+        Alert.alert("Success", response.message,[{text: "OK", onPress: () => navigation.navigate("SignIn")}]);
+      
     } catch (error) {
-      console.error(error);
-      Alert.alert("Error", "Something went wrong.");
+      Alert.alert("Error", error.message);
     }
 
   };

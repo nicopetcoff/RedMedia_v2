@@ -34,24 +34,17 @@ export const signUp = async (userData) => {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        name: userData.name,
-        lastName: userData.lastName,
-        email: userData.email,
-        password: userData.password,
-        nick: userData.nick,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Error al registrar el usuario: " + response.status);
-    }
+      body: JSON.stringify(userData),
+    });;
+    
 
     let data = await response.json();
+    if (data.status===400) {
+      throw new Error(data.message);
+    }
     return data;
 
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
