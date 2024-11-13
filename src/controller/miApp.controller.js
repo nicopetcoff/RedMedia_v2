@@ -33,20 +33,14 @@ export const signUp = async (userData) => {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
       },
-      body: JSON.stringify({
-        name: userData.name,
-        lastName: userData.lastName,
-        email: userData.email,
-        password: userData.password,
-        nick: userData.nick,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error("Error al registrar el usuario: " + response.status);
-    }
+      body: JSON.stringify(userData),
+    });;
+    
 
     let data = await response.json();
+    if (data.status===400) {
+      throw new Error(data.message);
+    }
     return data;
   } catch (error) {
     throw error;
@@ -69,11 +63,10 @@ export const signIn = async (userData) => {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Error al iniciar sesión: " + response.status);
-    }
-
     let data = await response.json();
+    if (data.status === 400) {
+      throw new Error(data.message);
+    }
     return data;
   } catch (error) {
     throw error;
@@ -93,11 +86,10 @@ export const sendPasswordResetEmail = async (email) => {
       body: JSON.stringify({ email }),
     });
 
-    if (!response.ok) {
-      throw new Error("Error al enviar el correo de recuperación: " + response.status);
-    }
-
     let data = await response.json();
+    if (data.status === 500) {
+      throw (data.message);
+    }
     return data;
   } catch (error) {
     throw error;
