@@ -91,11 +91,10 @@ export const sendPasswordResetEmail = async (email) => {
       body: JSON.stringify({ email }),
     });
 
-    if (!response.ok) {
-      throw new Error("Error al enviar el correo de recuperación: " + response.status);
-    }
-
     let data = await response.json();
+    if (data.status === 500) {
+      throw (data.message);
+    }
     return data;
 
   } catch (error) {
