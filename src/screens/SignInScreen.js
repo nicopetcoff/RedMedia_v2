@@ -42,7 +42,7 @@ const SignInScreen = ({ navigation }) => {
               style={styles.logo}
             />
             <Text style={styles.title}>REDMEDIA</Text>
-            <Text style={styles.welcomeText}>Welcome back</Text>
+            <Text style={styles.welcomeText}>Bienvenido de nuevo</Text>
 
           <FormikInputValue name="email" placeholder="Enter your email" placeholderTextColor="#aaa" keyboardType="email-address" />
           <FormikInputValue name="password" placeholder="Enter your password" placeholderTextColor="#aaa" secureTextEntry={true} />
