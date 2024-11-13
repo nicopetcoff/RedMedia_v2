@@ -65,11 +65,10 @@ export const signIn = async (userData) => {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Error al iniciar sesión: " + response.status);
-    }
-
     let data = await response.json();
+    if (data.status === 400) {
+      throw new Error(data.message);
+    }
     return data;
 
   } catch (error) {
