@@ -17,9 +17,8 @@ export const getPosts = async function () {
     }
 
     let data = await response.json();
-    return data;  // Aquí debería devolver los datos del backend.
+    return data;
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
@@ -43,14 +42,13 @@ export const signUp = async (userData) => {
       throw new Error(data.message);
     }
     return data;
-
   } catch (error) {
     throw error;
   }
 };
 
 export const signIn = async (userData) => {
-  let url = urlWebServices.signIn;  // URL para el endpoint de inicio de sesión
+  let url = urlWebServices.signIn;
 
   try {
     let response = await fetch(url, {
@@ -70,14 +68,11 @@ export const signIn = async (userData) => {
       throw new Error(data.message);
     }
     return data;
-
   } catch (error) {
-    console.error("Error:", error);
     throw error;
   }
 };
 
-// Función nueva añadida
 export const sendPasswordResetEmail = async (email) => {
   let url = urlWebServices.passwordReset;
 
@@ -96,24 +91,20 @@ export const sendPasswordResetEmail = async (email) => {
       throw (data.message);
     }
     return data;
-
   } catch (error) {
-    console.error("Error al enviar el correo de recuperación:", error);
     throw error;
   }
 };
 
-// Función user/me
 export const getUserData = async (token) => {
-  let url = urlWebServices.getProfile; // URL para el endpoint de perfil
-  try {
-    console.log("Sending request to:", url); // Muestra la URL del endpoint
+  let url = urlWebServices.getProfile;
 
+  try {
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "x-access-token": token, // Enviar el token en los headers
+        "x-access-token": token,
       },
     });
 
@@ -122,31 +113,27 @@ export const getUserData = async (token) => {
     }
 
     const data = await response.json();
-
-    return data; // Retorna los datos del usuario
+    return data;
   } catch (error) {
-    console.error("Error fetching user data:", error); // Manejo de errores
-    throw error; // Propaga el error
+    throw error;
   }
 };
 
 export const updateProfileImage = async (imageUri, token) => {
   const formData = new FormData();
-  
-  // Cambia 'avatar' a lo que espera tu backend si es necesario
   formData.append('avatar', {
     uri: imageUri,
-    type: 'image/jpeg', // Ajusta el tipo si es necesario (image/png para PNG)
-    name: 'profile.jpg', // El nombre que desees
+    type: 'image/jpeg',
+    name: 'profile.jpg',
   });
 
   try {
-    const response = await fetch(`${urlWebServices.updateProfileImage}`, { // Asegúrate de que la URL sea correcta
+    const response = await fetch(`${urlWebServices.updateProfileImage}`, {
       method: 'POST',
       body: formData,
       headers: {
         'Content-Type': 'multipart/form-data',
-        'x-access-token': token, // Agrega el token aquí
+        'x-access-token': token,
       },
     });
 
@@ -155,11 +142,89 @@ export const updateProfileImage = async (imageUri, token) => {
     }
 
     const data = await response.json();
-    console.log('Imagen de perfil actualizada:', data);
-    return data; // Devuelve los datos que necesites del backend
+    return data;
   } catch (error) {
-    console.error('Error al enviar la imagen:', error);
-    throw error; // Propaga el error
+    throw error;
   }
 };
 
+export const publishPost = async (postData, token) => {
+  try {
+    let url = urlWebServices.postPost;
+    
+    const formData = new FormData();
+    
+    // Agregar datos del post
+    formData.append('title', postData.title);
+    formData.append('description', postData.description);
+    formData.append('location', postData.location);
+    formData.append('user', postData.user);
+    formData.append('userAvatar', postData.userAvatar);
+
+    // Agregar imágenes
+    postData.images.forEach((imageUri, index) => {
+      let localUri = imageUri;
+      let filename = localUri.split('/').pop();
+
+      // Extraer la extensión del archivo
+      let match = /\.(\w+)$/.exec(filename);
+      let type = match ? `image/${match[1]}` : `image/jpeg`;
+
+      formData.append('images', {
+        uri: localUri,
+        name: filename,
+        type
+      });
+    });
+
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'x-access-token': token
+      },
+      body: formData
+    });
+
+    const responseData = await response.json();
+
+    if (response.ok) {
+      return { 
+        success: true, 
+        message: 'Post published successfully', 
+        data: responseData.data 
+      };
+    } else {
+      throw new Error(responseData.message || 'Failed to publish post');
+    }
+  } catch (error) {
+    console.error('Error en publishPost:', error);
+    return { 
+      success: false, 
+      message: error.message || 'Error connecting to server'
+    };
+  }
+};
+
+export const getAds = async () => {
+  let url = urlWebServices.getAds;
+
+  try {
+      const response = await fetch(url, {
+          method: "GET",
+          headers: {
+              Accept: "application/json",
+          },
+      });
+
+      if (!response.ok) {
+          throw new Error("Error al obtener los anuncios: " + response.status);
+      }
+
+      const data = await response.json();
+      return data;
+  } catch (error) {
+      throw error;
+  }
+};

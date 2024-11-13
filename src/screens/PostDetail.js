@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { ScrollView, StyleSheet, View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { useUserContext } from '../context/AuthProvider';
+import { getUserData } from '../controller/miApp.controller';
 import PostHeader from '../components/PostHeader';
 import PostImage from '../components/PostImage';
 import PostInteractionBar from '../components/PostInteractionBar';
@@ -8,9 +10,29 @@ import LocationIcon from '../assets/imgs/location.svg';
 
 const PostDetail = ({ route, navigation }) => {
   const { item } = route.params || {};
-
+  const { token } = useUserContext();
+  
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const response = await getUserData(token);
+        setUserData(response.data);
+      } catch (error) {
+        console.error('Error al obtener datos del usuario:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchUserData();
+    }
+  }, [token]);
 
   useEffect(() => {
     if (item?.sold) {
@@ -22,16 +44,34 @@ const PostDetail = ({ route, navigation }) => {
     return null;
   }
 
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#1DA1F2" />
+      </View>
+    );
+  }
+
+  const isOwnPost = userData?.usernickname === item?.user;
+
+  const handleUserPress = () => {
+    if (!isOwnPost) {
+      navigation.navigate('Profile', { username: item.user });
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity
-        onPress={() => navigation.navigate('Profile', { username: item.user })}
+        onPress={handleUserPress}
+        disabled={isOwnPost}
       >
         <PostHeader
-          userAvatar={item.userAvatar}
+          userAvatar={isOwnPost ? userData?.avatar : item.userAvatar}
           user={item.user}
           isFollowing={isFollowing}
           setIsFollowing={setIsFollowing}
+          isOwnPost={isOwnPost}
         />
       </TouchableOpacity>
       
@@ -49,7 +89,7 @@ const PostDetail = ({ route, navigation }) => {
       <View style={styles.line} />
       <View style={styles.likeSection}>
         <Text style={styles.likeText}>
-          Liked by <Text style={styles.boldText}>{item.likes || 0}</Text>
+          Le gusta a <Text style={styles.boldText}>{item.likes || 0}</Text> personas
         </Text>
       </View>
       <PostComments comments={item.comments} />
@@ -63,14 +103,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     paddingBottom: 20,
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
   titleContainer: {
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
     marginBottom: 10,
   },
   title: {
     fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
+    fontFamily: 'Roboto',
   },
   locationContainer: {
     flexDirection: 'row',
@@ -81,12 +128,14 @@ const styles = StyleSheet.create({
   location: {
     fontSize: 12,
     color: '#555',
+    marginLeft: 4,
+    fontFamily: 'Roboto',
   },
   line: {
     height: 1,
-    backgroundColor: '#ccc',
-    marginHorizontal: 50,
-    marginVertical: 5,
+    backgroundColor: '#E1E8ED',
+    marginHorizontal: 15,
+    marginVertical: 10,
   },
   likeSection: {
     paddingHorizontal: 15,
@@ -95,6 +144,7 @@ const styles = StyleSheet.create({
   likeText: {
     fontSize: 14,
     color: '#333',
+    fontFamily: 'Roboto',
   },
   boldText: {
     fontWeight: 'bold',

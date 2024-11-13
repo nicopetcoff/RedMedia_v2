@@ -1,20 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, Image, TouchableOpacity, Switch } from 'react-native';
-import { useToggleContext } from '../context/AuthProvider';
+import { useUserContext, useToggleContext } from '../context/AuthProvider';
+import * as ImagePicker from 'expo-image-picker';
+import { updateProfileImage } from '../controller/miApp.controller';
 
-const EditProfileScreen = ({ navigation ,route}) => {
+const EditProfileScreen = ({ navigation, route }) => {
   const { avatar } = route.params;
+  const { token } = useUserContext(); // Obtiene el token desde el contexto
   const { signOut } = useToggleContext();
+
   const [nickname, setNickname] = useState('');
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [gender, setGender] = useState('');
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [profileImage, setProfileImage] = useState(avatar); // Inicializa el perfil con el avatar recibido
+  const [profileImage, setProfileImage] = useState(avatar);
   const [message, setMessage] = useState('');
 
   useEffect(() => {
-    setProfileImage(avatar); // Asegúrate de que profileImage tenga el valor inicial del avatar
+    setProfileImage(avatar);
   }, [avatar]);
 
   const handleLogout = async () => {
@@ -24,7 +28,7 @@ const EditProfileScreen = ({ navigation ,route}) => {
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    if (permissionResult.granted === false) {
+    if (!permissionResult.granted) {
       alert('Es necesario dar permisos para acceder a la galería.');
       return;
     }
@@ -44,7 +48,7 @@ const EditProfileScreen = ({ navigation ,route}) => {
 
   const takePhoto = async () => {
     const cameraPermission = await ImagePicker.requestCameraPermissionsAsync();
-    if (cameraPermission.granted === false) {
+    if (!cameraPermission.granted) {
       alert('Es necesario dar permisos para acceder a la cámara.');
       return;
     }
@@ -62,14 +66,12 @@ const EditProfileScreen = ({ navigation ,route}) => {
   };
 
   const handleImageUpdate = async (imageUri) => {
-    const token = await AsyncStorage.getItem('userToken');
     if (token) {
       try {
         const response = await updateProfileImage(imageUri, token);
         setMessage('Foto de perfil actualizada correctamente.');
         setTimeout(() => setMessage(''), 3000);
       } catch (error) {
-        console.error('Error al actualizar la imagen:', error);
         setMessage('Error al actualizar la foto de perfil.');
         setTimeout(() => setMessage(''), 3000);
       }
