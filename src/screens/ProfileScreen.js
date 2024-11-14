@@ -1,3 +1,4 @@
+// ProfileScreen.js
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -8,6 +9,7 @@ import {
   FlatList,
   Dimensions,
   ActivityIndicator,
+  Platform
 } from "react-native";
 import Post from "../components/Post";
 import { getPosts, getUsers } from "../controller/miApp.controller";
@@ -16,7 +18,9 @@ import { useUserContext } from "../context/AuthProvider";
 const { width: windowWidth } = Dimensions.get("window");
 
 const ProfileScreen = ({ route, navigation }) => {
-  const { username } = route.params;
+  const { username, fromScreen } = route.params;
+  
+  
   const { token } = useUserContext();
   const [user, setUser] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
@@ -35,7 +39,6 @@ const ProfileScreen = ({ route, navigation }) => {
           return;
         }
 
-        // Obtener usuarios
         const usersResponse = await getUsers(token);
         const foundUser = usersResponse.data.find(
           (u) => u.usernickname === username
@@ -48,7 +51,6 @@ const ProfileScreen = ({ route, navigation }) => {
 
         setUser(foundUser);
 
-        // Obtener posts del usuario
         const postsResponse = await getPosts();
         const userPosts = postsResponse.data.filter(
           (post) => post.user === username
@@ -67,7 +69,6 @@ const ProfileScreen = ({ route, navigation }) => {
 
   const toggleFollow = () => {
     setIsFollowing(!isFollowing);
-    // Aquí puedes añadir la lógica para seguir/dejar de seguir
   };
 
   if (loading) {
@@ -94,21 +95,13 @@ const ProfileScreen = ({ route, navigation }) => {
     );
   }
 
-  const renderItem = ({ item }) => (
-    <View style={styles.postContainer}>
-      <TouchableOpacity
-        onPress={() =>
-          navigation.navigate("PostDetail", {
-            item,
-            previousScreen: "Profile",
-            username: username,
-          })
-        }
-      >
-        <Post item={item} />
-      </TouchableOpacity>
-    </View>
-  );
+  const renderItem = ({ item }) => {
+    return (
+      <View style={styles.postContainer}>
+        <Post item={item} source="Profile" />
+      </View>
+    );
+  };
 
   const renderProfileHeader = () => (
     <View>
@@ -143,11 +136,11 @@ const ProfileScreen = ({ route, navigation }) => {
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statText}>{user.followers || 0}</Text>
-            <Text style={styles.statLabel}>Seguidores</Text>
+            <Text style={styles.statLabel}>Followers</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statText}>{user.following || 0}</Text>
-            <Text style={styles.statLabel}>Siguiendo</Text>
+            <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>
       </View>
@@ -164,7 +157,7 @@ const ProfileScreen = ({ route, navigation }) => {
             isFollowing && styles.followingButtonText,
           ]}
         >
-          {isFollowing ? "Siguiendo" : "Seguir"}
+          {isFollowing ? "Unfollow" : "Follow"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -187,6 +180,10 @@ const ProfileScreen = ({ route, navigation }) => {
 };
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   errorContainer: {
     flex: 1,
     justifyContent: "center",
@@ -285,28 +282,16 @@ const styles = StyleSheet.create({
   followingButtonText: {
     color: "#1DA1F2",
   },
-  postsContainer: {
-    paddingBottom: 20,
-  },
-  columnWrapper: {
-    justifyContent: "space-between",
-    paddingHorizontal: 10,
-    marginTop: 10,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
   postContainer: {
     flex: 1,
-    maxWidth: "50%", // Asegura que cada post ocupe la mitad del ancho
+    maxWidth: "50%",
     padding: 5,
   },
   postsContainer: {
     paddingBottom: 20,
   },
   columnWrapper: {
-    justifyContent: "flex-start", // Cambiado de space-between a flex-start
+    justifyContent: "flex-start",
     flexDirection: "row",
     flexWrap: "wrap",
   },

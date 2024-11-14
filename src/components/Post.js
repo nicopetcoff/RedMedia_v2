@@ -1,14 +1,21 @@
 import React, { memo, useCallback } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Post = ({ item }) => {
   const navigation = useNavigation();
+  const route = useRoute();
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
   const navigateToDetail = useCallback(() => {
-    navigation.navigate("PostDetail", { item });
-  }, [navigation, item]);
+    const params = {
+      item,
+      previousScreen: route.name,
+      fromScreen: route.name,
+      username: item.user,
+    };
+    navigation.navigate("PostDetail", params);
+  }, [navigation, route.name, item]);
 
   return (
     <TouchableOpacity onPress={navigateToDetail} style={styles.container}>

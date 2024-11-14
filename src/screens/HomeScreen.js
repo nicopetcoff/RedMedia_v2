@@ -8,13 +8,13 @@ import {
   ActivityIndicator,
   Linking,
   TouchableOpacity,
+  Platform
 } from "react-native";
 import Post from "../components/Post";
 import { getPosts, getAds } from "../controller/miApp.controller";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
 import Skeleton from "../components/Skeleton";
-
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [ads, setAds] = useState([]);
@@ -63,7 +63,7 @@ const HomeScreen = () => {
     if (adIndex !== null && ads[adIndex]) {
       const randomAd = ads[adIndex];
       return (
-        <TouchableOpacity
+        <TouchableOpacity 
           style={styles.adContainer}
           onPress={() => Linking.openURL(randomAd.Url)}
         >
@@ -75,19 +75,10 @@ const HomeScreen = () => {
         </TouchableOpacity>
       );
     }
-
+  
     return (
       <View style={styles.postContainer}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("PostDetail", {
-              item,
-              previousScreen: "Home",
-            })
-          }
-        >
-          <Post item={item} />
-        </TouchableOpacity>
+        <Post item={item} source="Home" />
       </View>
     );
   };
@@ -158,7 +149,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "black",
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   listContent: {
     paddingHorizontal: 10,
