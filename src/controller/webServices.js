@@ -12,6 +12,7 @@ const urlWebServices = {
   updateProfileImage: urlApi + "api/users/updateProfileImage",
   getNotifications: urlApi + "api/users/notificaciones",
   getUsers: urlApi + "api/users",
+  updateUserProfile: urlApi + "api/users/me",
   
   // Posts
   getPosts: urlApi + "api/posts",

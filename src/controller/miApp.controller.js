@@ -120,34 +120,6 @@ export const getUserData = async (token) => {
   }
 };
 
-export const updateProfileImage = async (imageUri, token) => {
-  const formData = new FormData();
-  formData.append('avatar', {
-    uri: imageUri,
-    type: 'image/jpeg',
-    name: 'profile.jpg',
-  });
-
-  try {
-    const response = await fetch(`${urlWebServices.updateProfileImage}`, {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'x-access-token': token,
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error('Error al actualizar la imagen de perfil: ' + response.status);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
 
 export const publishPost = async (postData, token) => {
   try {
@@ -255,6 +227,60 @@ export const getUsers = async (token) => {
     return data;
   } catch (error) {
     console.error('Error en getUsers:', error);
+    throw error;
+  }
+};
+
+export const updateUserProfile = async (userData, token) => {
+  let url = urlWebServices.updateUserProfile;
+  
+
+  try {
+    const formData = new FormData();
+
+    if (userData.avatar) {
+      
+      const imageUri = userData.avatar;
+      const uriParts = imageUri.split('.');
+      const fileType = uriParts[uriParts.length - 1];
+
+      formData.append('avatar', {
+        uri: imageUri,
+        name: `photo.${fileType}`,
+        type: `image/${fileType}`
+      });
+      
+    }
+
+    // Agregar otros campos si existen
+    if (userData.nombre) formData.append('nombre', userData.nombre);
+    if (userData.bio) formData.append('bio', userData.bio);
+
+    
+
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'multipart/form-data',
+        'x-access-token': token
+      },
+      body: formData
+    });
+
+    
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('❌ Error response:', errorData);
+      throw new Error(errorData.message || 'Error updating profile');
+    }
+
+    const data = await response.json();
+    
+    return data;
+  } catch (error) {
+    
     throw error;
   }
 };
