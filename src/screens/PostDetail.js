@@ -1,4 +1,3 @@
-// PostDetail.js
 import React, { useState, useEffect } from "react";
 import {
   ScrollView,
@@ -10,7 +9,7 @@ import {
   Platform
 } from "react-native";
 import { useUserContext } from "../context/AuthProvider";
-import { getUserData } from "../controller/miApp.controller";
+import { getUserData, getUsers } from "../controller/miApp.controller";
 import PostHeader from "../components/PostHeader";
 import PostImage from "../components/PostImage";
 import PostInteractionBar from "../components/PostInteractionBar";
@@ -25,24 +24,41 @@ const PostDetail = ({ route, navigation }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [postUserData, setPostUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getUserData(token);
-        setUserData(response.data);
+        setLoading(true);
+        // Obtener datos del usuario logueado
+        const [currentUserResponse, usersResponse] = await Promise.all([
+          getUserData(token),
+          getUsers(token)
+        ]);
+
+        setUserData(currentUserResponse.data);
+
+        // Buscar el usuario del post entre todos los usuarios
+        if (item?.user && usersResponse.data) {
+          const foundUser = usersResponse.data.find(
+            (u) => u.usernickname === item.user
+          );
+          if (foundUser) {
+            setPostUserData(foundUser);
+          }
+        }
       } catch (error) {
-        console.error("Error al obtener datos del usuario:", error);
+        console.error("Error al obtener datos de usuarios:", error);
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) {
-      fetchUserData();
+    if (token && item?.user) {
+      fetchData();
     }
-  }, [token]);
+  }, [token, item]);
 
   useEffect(() => {
     if (item?.sold) {
@@ -73,12 +89,11 @@ const PostDetail = ({ route, navigation }) => {
 
   const handleUserPress = () => {
     if (!isOwnPost) {
-      const params = {
-        username: item.user,
-        fromScreen: 'Home' // Esto asegura que el back desde Profile vaya a Home
-      };
       
-      navigation.navigate('Profile', params);
+      navigation.navigate('Profile', { 
+        username: item.user,
+        fromScreen: previousScreen || 'Home'
+      });
     }
   };
 
@@ -86,7 +101,7 @@ const PostDetail = ({ route, navigation }) => {
     <ScrollView contentContainerStyle={styles.container}>
       <TouchableOpacity onPress={handleUserPress} disabled={isOwnPost}>
         <PostHeader
-          userAvatar={isOwnPost ? userData?.avatar : item.userAvatar}
+          userAvatar={isOwnPost ? userData?.avatar : postUserData?.avatar}
           user={item.user}
           isFollowing={isFollowing}
           setIsFollowing={setIsFollowing}
