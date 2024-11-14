@@ -80,7 +80,7 @@ const MyProfileHeader = ({ userData }) => {
       </View>
 
       <View style={styles.levelContainer}>
-        <Text style={styles.level}>Nivel: {userData?.level || 0}</Text>
+        <Text style={styles.level}>Level: {userData?.level || 0}</Text>
       </View>
     </View>
   );
@@ -117,6 +117,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 6,
     borderRadius: 20,
+    width: 100,
+    height: 35,
+    alignItems: 'center',
+
   },
   editButtonText: {
     color: '#fff',
@@ -124,7 +128,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   mainContent: {
-    marginTop: 40, // Ajustado para el avatar más grande
+    marginTop: 40, 
     paddingHorizontal: 15,
   },
   userInfo: {
