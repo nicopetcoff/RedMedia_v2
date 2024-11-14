@@ -1,4 +1,3 @@
-
 const urlApi = 'https://backend-redmedia.onrender.com/'; // Para producción
 //const urlApi = 'http://10.0.2.2:4000/'; // Para Android Emulator
 // const urlApi = "http://[TU_IP_LOCAL]:4000/";  // Para dispositivos reales o iOS
