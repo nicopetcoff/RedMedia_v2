@@ -6,7 +6,6 @@ const Post = ({ item }) => {
   const navigation = useNavigation();
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
-  // Utiliza useCallback para memorizar la función de navegación
   const navigateToDetail = useCallback(() => {
     navigation.navigate("PostDetail", { item });
   }, [navigation, item]);
@@ -55,5 +54,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Memoriza el componente para evitar renders innecesarios
 export default memo(Post);

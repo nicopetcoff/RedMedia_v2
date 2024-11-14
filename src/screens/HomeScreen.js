@@ -13,14 +13,14 @@ import Post from "../components/Post";
 import { getPosts, getAds } from "../controller/miApp.controller";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
-import Skeleton from "../components/Skeleton"; // Agrega este componente
+import Skeleton from "../components/Skeleton";
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [page, setPage] = useState(1); // Para la paginación
+  const [page, setPage] = useState(1);
   const navigation = useNavigation();
 
   const fetchData = async (isLoadMore = false) => {
@@ -50,7 +50,6 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
-  // Genera índices aleatorios únicos para cada cuarta posición en la lista
   const adIndices = useMemo(() => {
     return posts.map((_, index) => (index + 1) % 4 === 0
       ? Math.floor(Math.random() * ads.length)
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 10,
     overflow: "hidden",
-    height: 200, // Ajusta según necesites
+    height: 200,
   },
   adImage: {
     width: "100%",
