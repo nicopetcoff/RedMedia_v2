@@ -19,7 +19,7 @@ const ForgotPasswordScreen = ({ navigation }) => {
     try {
       const response = await sendPasswordResetEmail(email);
 
-      Alert.alert('Restablecimiento de contraseña', 'Se han enviado instrucciones para restablecer su contraseña.',[{text: "OK", onPress: () => navigation.navigate("SignIn")}]);
+      Alert.alert('Password reset', 'Instructions for your password recovery have been sent',[{text: "OK", onPress: () => navigation.navigate("SignIn")}]);
       
     } catch (error) {
       Alert.alert('Error', error.message);
@@ -28,10 +28,10 @@ const ForgotPasswordScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Olvidaste la contraseña?</Text>
-      <Text style={styles.subtitle}>No te preocupes, Te vamos a ayudar</Text>
+      <Text style={styles.title}>Forgot your password?</Text>
+      <Text style={styles.subtitle}>Don't worry, we will send you instructions</Text>
       <Text style={styles.instructionText}>
-          Por favor ingrese su dirección de correo electrónico para restablecer su contraseña
+          Please enter your email address. You will receive a link to create a new password via email.
       </Text>
 
       <TextInput
