@@ -2,31 +2,31 @@ import * as yup from "yup";
 
 export const signUpValidationSchema = yup.object().shape({
   email: yup
-  .string()
-  .email("E-mail invalido")
-  .required("E-mail es requerido"),
-    password: yup
     .string()
-    .min(8, "La contraseña debe tener al menos 8 caracteres")
-    .required("La contraseña es requerida")
-    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/, 'La contraseña debe contener al menos una letra  y un número'),
-    name: yup
+    .email("Invalid email")
+    .required("Email is required"),
+  password: yup
     .string()
-    .required("El nombre es requerido"),
-    lastName: yup
+    .min(8, "Password must be at least 8 characters")
+    .required("Password is required")
+    .matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/, 'Password must contain at least one letter and one number'),
+  name: yup
     .string()
-    .required("El apellido es requerido"),
-    nick: yup
+    .required("Name is required"),
+  lastName: yup
     .string()
-    .required("El nick es requerido"),
+    .required("Last name is required"),
+  nick: yup
+    .string()
+    .required("Nickname is required"),
 });
 
 export const SignInValidationSchema = yup.object().shape({
-    email: yup
+  email: yup
     .string()
-    .email("E-mail invalido")
-    .required("E-mail es requerido"),
-    password: yup
+    .email("Invalid email")
+    .required("Email is required"),
+  password: yup
     .string()
-    .required("La contraseña es requerida"),
+    .required("Password is required"),
 });
