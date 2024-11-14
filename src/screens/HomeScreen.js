@@ -1,9 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image, ActivityIndicator, Linking, TouchableOpacity } from 'react-native';
-import Post from '../components/Post';
-import { getPosts, getAds } from '../controller/miApp.controller';
-import { useNavigation } from '@react-navigation/native';
-import Constants from 'expo-constants';
+// HomeScreen.js
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Image,
+  ActivityIndicator,
+  Linking,
+  TouchableOpacity,
+  Platform
+} from "react-native";
+import Post from "../components/Post";
+import { getPosts, getAds } from "../controller/miApp.controller";
+import { useNavigation } from "@react-navigation/native";
+import Constants from "expo-constants";
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
@@ -16,9 +27,9 @@ const HomeScreen = () => {
     try {
       const [postsResponse, adsResponse] = await Promise.all([
         getPosts(),
-        getAds()
+        getAds(),
       ]);
-      
+
       setPosts(postsResponse.data);
       setAds(adsResponse.data);
     } catch (error) {
@@ -29,17 +40,13 @@ const HomeScreen = () => {
 
   useEffect(() => {
     fetchData();
-
-    const unsubscribe = navigation.addListener('focus', fetchData);
+    const unsubscribe = navigation.addListener("focus", fetchData);
     return unsubscribe;
   }, [navigation]);
 
   const renderItem = ({ item, index }) => {
-    // Mostrar un anuncio cada 4 elementos (después de cada 3 posts)
     if ((index + 1) % 4 === 0 && ads.length > 0) {
-      // Seleccionar un anuncio aleatorio
       const randomAd = ads[Math.floor(Math.random() * ads.length)];
-      
       return (
         <TouchableOpacity 
           style={styles.adContainer}
@@ -53,11 +60,10 @@ const HomeScreen = () => {
         </TouchableOpacity>
       );
     }
-
-    // Renderizar post normal
+  
     return (
       <View style={styles.postContainer}>
-        <Post item={item} />
+        <Post item={item} source="Home" />
       </View>
     );
   };
@@ -73,10 +79,13 @@ const HomeScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.headerContainer}>
-        <Image source={require('../assets/imgs/logo.png')} style={styles.logo} />
+        <Image
+          source={require("../assets/imgs/logo.png")}
+          style={styles.logo}
+        />
         <Text style={styles.header}>REDMEDIA</Text>
       </View>
-      
+
       <FlatList
         data={posts}
         renderItem={renderItem}
@@ -93,16 +102,16 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     paddingTop: Constants.statusBarHeight,
   },
   headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 12,
     paddingHorizontal: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#efefef',
+    borderBottomColor: "#efefef",
   },
   logo: {
     width: 50,
@@ -111,16 +120,16 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: 'black',
-    fontFamily: 'Roboto',
+    fontWeight: "bold",
+    color: "black",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   listContent: {
     paddingHorizontal: 10,
     paddingTop: 10,
   },
   row: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   postContainer: {
     flex: 1,
@@ -132,19 +141,19 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     marginBottom: 15,
     borderRadius: 10,
-    overflow: 'hidden',
-    height: 200, // Ajusta según necesites
+    overflow: "hidden",
+    height: 200,
   },
   adImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
     borderRadius: 10,
   },
   loaderContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });
 

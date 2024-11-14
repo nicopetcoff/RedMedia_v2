@@ -229,3 +229,32 @@ export const getAds = async () => {
       throw error;
   }
 };
+
+export const getUsers = async (token) => {
+  let url = urlWebServices.getUsers;
+  
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "x-access-token": token
+      },
+    });
+
+    
+    
+    if (!response.ok) {
+      throw new Error("Error al obtener los usuarios: " + response.status);
+    }
+
+    const data = await response.json();
+    
+    return data;
+  } catch (error) {
+    console.error('Error en getUsers:', error);
+    throw error;
+  }
+};

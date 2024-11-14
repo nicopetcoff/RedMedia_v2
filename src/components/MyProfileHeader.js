@@ -50,7 +50,7 @@ const MyProfileHeader = ({ userData }) => {
           style={styles.editButton}
           onPress={handleEditPress}
         >
-          <Text style={styles.editButtonText}>Editar</Text>
+          <Text style={styles.editButtonText}>Edit</Text>
         </TouchableOpacity>
       </View>
 
