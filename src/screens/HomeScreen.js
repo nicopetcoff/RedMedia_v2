@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -8,11 +8,13 @@ import {
   ActivityIndicator,
   Linking,
   TouchableOpacity,
+  Platform
 } from "react-native";
 import Post from "../components/Post";
 import { getPosts, getAds } from "../controller/miApp.controller";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
+import Skeleton from "../components/Skeleton";
 
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
@@ -20,7 +22,7 @@ const HomeScreen = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [page, setPage] = useState(1); // Página para el scroll infinito
+  const [page, setPage] = useState(1);
   const navigation = useNavigation();
 
   const fetchData = async (isLoadMore = false) => {
@@ -65,11 +67,20 @@ const HomeScreen = () => {
     return unsubscribe;
   }, [navigation]);
 
+  const adIndices = useMemo(() => {
+    return posts.map((_, index) => (index + 1) % 4 === 0
+      ? Math.floor(Math.random() * ads.length)
+      : null
+    );
+  }, [posts, ads]);
+
   const renderItem = ({ item, index }) => {
-    if ((index + 1) % 4 === 0 && ads.length > 0) {
-      const randomAd = ads[Math.floor(Math.random() * ads.length)];
+    const adIndex = adIndices[index];
+
+    if (adIndex !== null && ads[adIndex]) {
+      const randomAd = ads[adIndex];
       return (
-        <TouchableOpacity
+        <TouchableOpacity 
           style={styles.adContainer}
           onPress={() => Linking.openURL(randomAd.Url)}
         >
@@ -81,19 +92,10 @@ const HomeScreen = () => {
         </TouchableOpacity>
       );
     }
-
+  
     return (
       <View style={styles.postContainer}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("PostDetail", {
-              item,
-              previousScreen: "Home",
-            })
-          }
-        >
-          <Post item={item} />
-        </TouchableOpacity>
+        <Post item={item} source="Home" />
       </View>
     );
   };
@@ -105,8 +107,10 @@ const HomeScreen = () => {
 
   if (loading && !refreshing) {
     return (
-      <View style={styles.loaderContainer}>
-        <ActivityIndicator size="large" color="#1DA1F2" />
+      <View style={styles.skeletonContainer}>
+        {[...Array(6)].map((_, index) => (
+          <Skeleton key={index} style={styles.skeleton} />
+        ))}
       </View>
     );
   }
@@ -134,6 +138,9 @@ const HomeScreen = () => {
         onEndReached={() => fetchData(true)}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        windowSize={5}
       />
     </View>
   );
@@ -162,7 +169,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "black",
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   listContent: {
     paddingHorizontal: 10,
@@ -194,6 +201,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#fff",
+  },
+  skeletonContainer: {
+    flex: 1,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    paddingHorizontal: 10,
+    paddingTop: 10,
+  },
+  skeleton: {
+    width: "47%",
+    height: 150,
+    marginBottom: 15,
+    backgroundColor: "#ddd",
+    borderRadius: 8,
   },
 });
 

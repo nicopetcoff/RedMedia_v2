@@ -42,7 +42,7 @@ const PostHeader = ({
               isFollowing && styles.followingButtonText,
             ]}
           >
-            {isFollowing ? "Siguiendo" : "Seguir"}
+            {isFollowing ? "Unfollw" : "Follow"}
           </Text>
         </TouchableOpacity>
       )}

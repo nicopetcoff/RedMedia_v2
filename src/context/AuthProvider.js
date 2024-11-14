@@ -65,8 +65,7 @@ export const AuthProvider = ({ children }) => {
         Alert.alert('Error', 'Inicio de sesión fallido. Por favor, inténtalo de nuevo.');
       }
     } catch (error) {
-      console.error('Error durante el inicio de sesión:', error);
-      Alert.alert('Error', 'Hubo un problema durante el inicio de sesión.');
+      Alert.alert('Error', error.message);
     }
   };
 

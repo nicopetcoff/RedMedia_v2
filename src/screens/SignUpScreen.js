@@ -7,28 +7,24 @@ import {
   Image,
   Alert,
 } from "react-native";
-import { signUp } from "../controller/miApp.controller"; // Importamos la función para enviar los datos
+import { signUp } from "../controller/miApp.controller";
 import { Formik } from "formik";
 import { signUpValidationSchema } from "../context/validationSchemas";
-import {FormikInputValue} from "../components/FormikInputValue";
+import { FormikInputValue } from "../components/FormikInputValue";
 import { useNavigation } from '@react-navigation/native';
 
 const SignUpScreen = () => {
   const navigation = useNavigation();
-  // Función para validar los campos
-  const handleSignUp = async (userData) => {
-    // Preparar el objeto con los datos del usuario
-    console.log(userData);
-    try {
-      // Llamar a la función signUp que enviará los datos al backend
-      const response = await signUp(userData);
 
-        Alert.alert("Success", response.message,[{text: "OK", onPress: () => navigation.navigate("SignIn")}]);
-      
+  const handleSignUp = async (userData) => {
+    try {
+      const response = await signUp(userData);
+      Alert.alert("Success", response.message, [
+        { text: "OK", onPress: () => navigation.navigate("SignIn") },
+      ]);
     } catch (error) {
       Alert.alert("Error", error.message);
     }
-
   };
 
   const initialValues = {
@@ -49,7 +45,7 @@ const SignUpScreen = () => {
         return (
           <View style={styles.container}>
             <Image
-              source={require("../assets/imgs/logo.png")} // Asegúrate de tener el logo en tu carpeta assets
+              source={require("../assets/imgs/logo.png")}
               style={styles.logo}
             />
             <Text style={styles.title}>Create your account</Text>
@@ -80,7 +76,6 @@ const SignUpScreen = () => {
               placeholder="Enter your nick"
               placeholderTextColor="#aaa"
             />
-
             <TouchableOpacity
               style={styles.signUpButton}
               onPress={handleSubmit}

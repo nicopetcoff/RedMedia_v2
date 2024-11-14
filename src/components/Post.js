@@ -1,16 +1,24 @@
-import React from "react";
+import React, { memo, useCallback } from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Post = ({ item }) => {
   const navigation = useNavigation();
+  const route = useRoute();
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
+  const navigateToDetail = useCallback(() => {
+    const params = {
+      item,
+      previousScreen: route.name,
+      fromScreen: route.name,
+      username: item.user,
+    };
+    navigation.navigate("PostDetail", params);
+  }, [navigation, route.name, item]);
+
   return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("PostDetail", { item })}
-      style={styles.container}
-    >
+    <TouchableOpacity onPress={navigateToDetail} style={styles.container}>
       <Image source={{ uri: imageUri }} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.title} numberOfLines={2}>
@@ -27,15 +35,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "white",
     marginBottom: 2,
+    borderRadius: 12,
+    overflow: "hidden",
   },
   image: {
     aspectRatio: 1,
     width: "100%",
-    borderRadius: 12,
   },
   textContainer: {
     paddingTop: 6,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
     paddingBottom: 12,
   },
   title: {
@@ -52,4 +61,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Post;
+export default memo(Post);
