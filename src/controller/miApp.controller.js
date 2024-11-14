@@ -150,7 +150,6 @@ export const updateProfileImage = async (imageUri, token) => {
 
 export const publishPost = async (postData, token) => {
   try {
-    console.log("FRONT POSTDATA", postData);
 
     // La URL de los servicios web
     const url = urlWebServices.postPost;
@@ -198,10 +197,8 @@ export const publishPost = async (postData, token) => {
     }
 
     // Verificar los datos enviados
-    console.log("Datos de FormData:");
     for (let i = 0; i < formData._parts.length; i++) {
       const part = formData._parts[i];
-      console.log(`Key: ${part[0]}, Value: ${JSON.stringify(part[1])}`);
     }
 
     // Realizar la solicitud fetch para enviar los datos al backend
@@ -226,7 +223,6 @@ export const publishPost = async (postData, token) => {
 
     // Analizar JSON si la respuesta es válida
     const responseData = await response.json();
-    console.log('Server response:', responseData);
 
     // Si la respuesta es exitosa, retornar el resultado
     if (response.ok) {

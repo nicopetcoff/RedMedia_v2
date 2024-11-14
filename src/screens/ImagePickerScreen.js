@@ -132,7 +132,6 @@ const ImagePickerScreen = ({ navigation }) => {
         }));
         setSelectedImages((prevSelectedImages) => {
           const combinedItems = [...prevSelectedImages, ...newItems].slice(0, 10);
-          console.log("Updated selected items:", combinedItems); // Log updated list
           return combinedItems;
         });
       }
@@ -175,9 +174,6 @@ const ImagePickerScreen = ({ navigation }) => {
         user: userData.usernickname,
         userAvatar: userData.avatar,
       };
-  
-      // Log para asegurarnos de que los datos se envían correctamente
-      console.log("Post data:", postData);
   
       // Llamamos a la función publishPost pasándole los datos
       const result = await publishPost(postData, token);
