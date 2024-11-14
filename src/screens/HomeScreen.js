@@ -18,22 +18,45 @@ const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [page, setPage] = useState(1); // Página para el scroll infinito
   const navigation = useNavigation();
 
-  const fetchData = async () => {
-    setLoading(true);
+  const fetchData = async (isLoadMore = false) => {
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
+
     try {
       const [postsResponse, adsResponse] = await Promise.all([
-        getPosts(),
+        getPosts(page),
         getAds(),
       ]);
 
-      setPosts(postsResponse.data);
       setAds(adsResponse.data);
+      setPosts((prevPosts) =>
+        isLoadMore ? [...prevPosts, ...postsResponse.data] : postsResponse.data
+      );
+
+      if (isLoadMore) {
+        setPage((prevPage) => prevPage + 1);
+      }
     } catch (error) {
       console.error("Error al cargar los datos", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      setRefreshing(false);
     }
-    setLoading(false);
+  };
+
+  const refreshData = async () => {
+    setPage(1);
+    setRefreshing(true);
+    await fetchData(false);
   };
 
   useEffect(() => {
@@ -75,7 +98,12 @@ const HomeScreen = () => {
     );
   };
 
-  if (loading) {
+  const renderFooter = () => {
+    if (!loadingMore) return null;
+    return <ActivityIndicator size="small" color="#1DA1F2" />;
+  };
+
+  if (loading && !refreshing) {
     return (
       <View style={styles.loaderContainer}>
         <ActivityIndicator size="large" color="#1DA1F2" />
@@ -96,11 +124,16 @@ const HomeScreen = () => {
       <FlatList
         data={posts}
         renderItem={renderItem}
-        keyExtractor={(item, index) => item._id || `ad-${index}`}
+        keyExtractor={(item, index) => `${item._id || `ad`}-${index}`}
         numColumns={2}
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        refreshing={refreshing}
+        onRefresh={refreshData}
+        onEndReached={() => fetchData(true)}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
       />
     </View>
   );
@@ -149,7 +182,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 10,
     overflow: "hidden",
-    height: 200, // Ajusta según necesites
+    height: 200,
   },
   adImage: {
     width: "100%",
