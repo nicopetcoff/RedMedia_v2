@@ -15,17 +15,22 @@ import { getPosts, getAds } from "../controller/miApp.controller";
 import { useNavigation } from "@react-navigation/native";
 import Constants from "expo-constants";
 import Skeleton from "../components/Skeleton";
+
 const HomeScreen = () => {
   const [posts, setPosts] = useState([]);
   const [ads, setAds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [page, setPage] = useState(1);
   const navigation = useNavigation();
 
   const fetchData = async (isLoadMore = false) => {
-    if (isLoadMore) setLoadingMore(true);
-    else setLoading(true);
+    if (isLoadMore) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
 
     try {
       const [postsResponse, adsResponse] = await Promise.all([
@@ -34,14 +39,26 @@ const HomeScreen = () => {
       ]);
 
       setAds(adsResponse.data);
-      setPosts(prevPosts => (isLoadMore ? [...prevPosts, ...postsResponse.data] : postsResponse.data));
-      setPage(prevPage => prevPage + 1);
+      setPosts((prevPosts) =>
+        isLoadMore ? [...prevPosts, ...postsResponse.data] : postsResponse.data
+      );
+
+      if (isLoadMore) {
+        setPage((prevPage) => prevPage + 1);
+      }
     } catch (error) {
       console.error("Error al cargar los datos", error);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      setRefreshing(false);
     }
-    
-    setLoading(false);
-    setLoadingMore(false);
+  };
+
+  const refreshData = async () => {
+    setPage(1);
+    setRefreshing(true);
+    await fetchData(false);
   };
 
   useEffect(() => {
@@ -84,10 +101,11 @@ const HomeScreen = () => {
   };
 
   const renderFooter = () => {
-    return loadingMore ? <ActivityIndicator size="small" color="#1DA1F2" /> : null;
+    if (!loadingMore) return null;
+    return <ActivityIndicator size="small" color="#1DA1F2" />;
   };
 
-  if (loading && page === 1) {
+  if (loading && !refreshing) {
     return (
       <View style={styles.skeletonContainer}>
         {[...Array(6)].map((_, index) => (
@@ -110,17 +128,19 @@ const HomeScreen = () => {
       <FlatList
         data={posts}
         renderItem={renderItem}
-        keyExtractor={(item, index) => `${item._id || `ad-${index}`}-${index}`}
+        keyExtractor={(item, index) => `${item._id || `ad`}-${index}`}
         numColumns={2}
         columnWrapperStyle={styles.row}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.listContent}
+        refreshing={refreshing}
+        onRefresh={refreshData}
         onEndReached={() => fetchData(true)}
         onEndReachedThreshold={0.5}
         ListFooterComponent={renderFooter}
-        initialNumToRender={10}  // Renderiza solo los primeros 10 elementos inicialmente
-        maxToRenderPerBatch={5}  // Controla cuántos elementos se renderizan por lote
-        windowSize={5}           // Controla la cantidad de elementos que el FlatList mantiene en memoria
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        windowSize={5}
       />
     </View>
   );
