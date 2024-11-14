@@ -9,8 +9,8 @@ import {
   FlatList,
   ScrollView,
   Alert,
+  Switch
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
@@ -28,6 +28,11 @@ const ImagePickerScreen = ({ navigation }) => {
   const [selectedLocation, setSelectedLocation] = useState("");
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(true);
+
+  const toggleSwitch = () => setIsEnabled(previousState => !previousState);
+
+  const deleteLocation = () => setSelectedLocation("");
 
   const { token } = useUserContext();
 
@@ -155,7 +160,7 @@ const ImagePickerScreen = ({ navigation }) => {
       const postData = {
         title: title.trim(),
         description: description.trim(),
-        location: selectedLocation || location,
+        location: selectedLocation,
         images: selectedImages.map((image) => image.uri),
         user: userData.usernickname,
         userAvatar: userData.avatar,
@@ -285,15 +290,31 @@ const ImagePickerScreen = ({ navigation }) => {
         <Text style={styles.characterCount}>{300 - description.length}</Text>
 
         <Text style={styles.textTitles}>Location</Text>
-        <Picker
-          selectedValue={selectedLocation}
-          style={styles.locationPicker}
-          onValueChange={setSelectedLocation}
-          enabled={!loading}
-        >
-          <Picker.Item label={location} value={location} />
-          <Picker.Item label="Quilmes" value="Quilmes" />
-        </Picker>
+        <View style={styles.switchContainer}>
+        <Text>Use Actual Location</Text>
+        <Switch
+          trackColor={{ false: '#767577', true: '#81b0ff' }}
+          thumbColor={isEnabled ? '#f5dd4b' : '#f4f3f4'}
+          ios_backgroundColor="#3e3e3e"
+          onValueChange={() => {
+            deleteLocation();
+            toggleSwitch();
+          }}
+          value={isEnabled}
+        />
+        </View>
+        {isEnabled ? (
+        <Text style={styles.locationText}>
+          {location}
+        </Text>
+      ) : (
+        <TextInput
+          style={styles.input}
+          placeholder="Enter location"
+          onChangeText={setSelectedLocation}
+          editable={!loading}
+        />
+      )}
       </View>
     </ScrollView>
   );
@@ -409,6 +430,12 @@ const styles = StyleSheet.create({
     height: 40,
     marginBottom: 20,
   },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 16,
+  }, 
 });
 
 export default ImagePickerScreen;
