@@ -14,6 +14,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import Geocoder from "react-native-geocoding";
+import { Video } from 'expo-av'; // Importar el componente Video
 import { publishPost, getUserData } from "../controller/miApp.controller";
 import { useUserContext } from "../context/AuthProvider";
 import { useFocusEffect } from "@react-navigation/native";
@@ -86,10 +87,10 @@ const ImagePickerScreen = ({ navigation }) => {
 
         const formattedLocation = `${city}, ${state}, ${country}`;
         setLocation(formattedLocation || "Location not found");
-        isEnabled ?
-          setSelectedLocation(formattedLocation || "Location not found")
-          :
-          setSelectedLocation("")
+        isEnabled ? 
+          setSelectedLocation(formattedLocation || "Location not found") 
+          : 
+          setSelectedLocation("");
       } catch (error) {
         console.error("Error getting location:", error);
         setLocation("Unknown location");
@@ -112,28 +113,32 @@ const ImagePickerScreen = ({ navigation }) => {
       }
 
       if (selectedImages.length >= 10) {
-        Alert.alert("Limit Reached", "You can only add up to 10 images.");
+        Alert.alert("Limit Reached", "You can only add up to 10 items.");
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
         allowsMultipleSelection: true,
         selectionLimit: 10 - selectedImages.length,
         quality: 0.8,
       });
 
       if (!result.canceled && result.assets) {
-        const newImages = result.assets.map((asset) => ({
+        const newItems = result.assets.map((asset) => ({
           id: asset.uri,
           uri: asset.uri,
+          type: asset.type,
         }));
-        const totalImages = [...selectedImages, ...newImages].slice(0, 10);
-        setSelectedImages(totalImages);
+        setSelectedImages((prevSelectedImages) => {
+          const combinedItems = [...prevSelectedImages, ...newItems].slice(0, 10);
+          console.log("Updated selected items:", combinedItems); // Log updated list
+          return combinedItems;
+        });
       }
     } catch (error) {
-      console.error("Error picking image:", error);
-      Alert.alert("Error", "Failed to pick image");
+      console.error("Error picking media:", error);
+      Alert.alert("Error", "Failed to pick media files");
     }
   };
 
@@ -146,40 +151,43 @@ const ImagePickerScreen = ({ navigation }) => {
       Alert.alert("Error", "Please enter a title");
       return;
     }
-
+  
     if (selectedImages.length === 0) {
-      Alert.alert("Error", "Please select at least one image");
+      Alert.alert("Error", "Please select at least one image or video");
       return;
     }
-
+  
     if (!userData) {
       Alert.alert("Error", "User data not available");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
+      // Preparamos el objeto de datos del post
       const postData = {
         title: title.trim(),
         description: description.trim(),
         location: selectedLocation,
-        images: selectedImages.map((image) => image.uri),
+        // Aquí, estamos pasando tanto imágenes como videos en el array
+        media: selectedImages.map((item) => item.uri), // Solo enviamos las URIs de las imágenes y videos
         user: userData.usernickname,
         userAvatar: userData.avatar,
       };
-
-      // Log del objeto postData completo
-
+  
+      // Log para asegurarnos de que los datos se envían correctamente
+      console.log("Post data:", postData);
+  
+      // Llamamos a la función publishPost pasándole los datos
       const result = await publishPost(postData, token);
-
-      // Log del resultado
-
+  
       if (result.success) {
         Alert.alert("Success", "Post published successfully", [
           {
             text: "OK",
             onPress: () => {
+              // Limpiamos los campos después de la publicación exitosa
               setTitle("");
               setDescription("");
               setSelectedImages([]);
@@ -208,10 +216,7 @@ const ImagePickerScreen = ({ navigation }) => {
         <Text></Text>
         <TouchableOpacity onPress={handlePush} disabled={isPublishDisabled}>
           <Text
-            style={[
-              styles.publishText,
-              isPublishDisabled && styles.publishTextDisabled,
-            ]}
+            style={[styles.publishText, isPublishDisabled && styles.publishTextDisabled]}
           >
             {loading ? "Publishing..." : "Push"}
           </Text>
@@ -234,16 +239,11 @@ const ImagePickerScreen = ({ navigation }) => {
 
       <TouchableOpacity
         onPress={openGallery}
-        style={[
-          styles.selectButton,
-          selectedImages.length >= 10 && styles.selectButtonDisabled,
-        ]}
+        style={[styles.selectButton, selectedImages.length >= 10 && styles.selectButtonDisabled]}
         disabled={selectedImages.length >= 10}
       >
         <Text style={styles.selectButtonText}>
-          {selectedImages.length >= 10
-            ? "Maximum images selected"
-            : "Open Gallery"}
+          {selectedImages.length >= 10 ? "Maximum images selected" : "Open Gallery"}
         </Text>
       </TouchableOpacity>
 
@@ -254,7 +254,18 @@ const ImagePickerScreen = ({ navigation }) => {
           horizontal
           renderItem={({ item }) => (
             <View style={styles.imageContainer}>
-              <Image source={{ uri: item.uri }} style={styles.selectedImage} />
+              {item.type === 'video' ? (
+                <Video
+                  source={{ uri: item.uri }}
+                  style={styles.selectedImage}
+                  useNativeControls
+                  resizeMode="cover"
+                  shouldPlay
+                  isLooping
+                />
+              ) : (
+                <Image source={{ uri: item.uri }} style={styles.selectedImage} />
+              )}
               <TouchableOpacity
                 style={styles.removeImageButton}
                 onPress={() => removeImage(item.id)}
