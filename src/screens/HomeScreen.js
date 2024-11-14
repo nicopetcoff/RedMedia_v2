@@ -1,3 +1,4 @@
+// HomeScreen.js
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -8,6 +9,7 @@ import {
   ActivityIndicator,
   Linking,
   TouchableOpacity,
+  Platform
 } from "react-native";
 import Post from "../components/Post";
 import { getPosts, getAds } from "../controller/miApp.controller";
@@ -46,7 +48,7 @@ const HomeScreen = () => {
     if ((index + 1) % 4 === 0 && ads.length > 0) {
       const randomAd = ads[Math.floor(Math.random() * ads.length)];
       return (
-        <TouchableOpacity
+        <TouchableOpacity 
           style={styles.adContainer}
           onPress={() => Linking.openURL(randomAd.Url)}
         >
@@ -58,19 +60,10 @@ const HomeScreen = () => {
         </TouchableOpacity>
       );
     }
-
+  
     return (
       <View style={styles.postContainer}>
-        <TouchableOpacity
-          onPress={() =>
-            navigation.navigate("PostDetail", {
-              item,
-              previousScreen: "Home",
-            })
-          }
-        >
-          <Post item={item} />
-        </TouchableOpacity>
+        <Post item={item} source="Home" />
       </View>
     );
   };
@@ -129,7 +122,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "bold",
     color: "black",
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   listContent: {
     paddingHorizontal: 10,
@@ -149,7 +142,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 10,
     overflow: "hidden",
-    height: 200, // Ajusta según necesites
+    height: 200,
   },
   adImage: {
     width: "100%",

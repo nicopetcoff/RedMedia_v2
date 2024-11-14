@@ -18,7 +18,7 @@ const SignUpScreen = () => {
   // Función para validar los campos
   const handleSignUp = async (userData) => {
     // Preparar el objeto con los datos del usuario
-    console.log(userData);
+    
     try {
       // Llamar a la función signUp que enviará los datos al backend
       const response = await signUp(userData);

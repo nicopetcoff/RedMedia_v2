@@ -1,3 +1,4 @@
+// PostDetail.js
 import React, { useState, useEffect } from "react";
 import {
   ScrollView,
@@ -6,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   ActivityIndicator,
+  Platform
 } from "react-native";
 import { useUserContext } from "../context/AuthProvider";
 import { getUserData } from "../controller/miApp.controller";
@@ -16,9 +18,10 @@ import PostComments from "../components/PostComments";
 import LocationIcon from "../assets/imgs/location.svg";
 
 const PostDetail = ({ route, navigation }) => {
-  const { item, source, username } = route.params || {};
-  const { token } = useUserContext();
+  const { item, previousScreen, username, fromScreen } = route.params || {};
+  
 
+  const { token } = useUserContext();
   const [isFollowing, setIsFollowing] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [userData, setUserData] = useState(null);
@@ -43,9 +46,16 @@ const PostDetail = ({ route, navigation }) => {
 
   useEffect(() => {
     if (item?.sold) {
-      navigation.goBack();
+      if (previousScreen === 'Profile') {
+        navigation.navigate('Profile', {
+          username,
+          fromScreen: fromScreen || 'Home'
+        });
+      } else {
+        navigation.goBack();
+      }
     }
-  }, [item, navigation]);
+  }, [item, navigation, previousScreen, username, fromScreen]);
 
   if (!item || item.sold) {
     return null;
@@ -63,10 +73,12 @@ const PostDetail = ({ route, navigation }) => {
 
   const handleUserPress = () => {
     if (!isOwnPost) {
-      navigation.navigate("Profile", {
+      const params = {
         username: item.user,
-        previousScreen: "PostDetail",
-      });
+        fromScreen: 'Home' // Esto asegura que el back desde Profile vaya a Home
+      };
+      
+      navigation.navigate('Profile', params);
     }
   };
 
@@ -130,12 +142,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "bold",
     color: "#000",
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   description: {
     fontSize: 13,
     color: "#555",
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
     marginTop: 4,
   },
   locationContainer: {
@@ -148,7 +160,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#555",
     marginLeft: 4,
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   line: {
     height: 1,
@@ -163,7 +175,7 @@ const styles = StyleSheet.create({
   likeText: {
     fontSize: 14,
     color: "#333",
-    fontFamily: "Roboto",
+    fontFamily: Platform.OS === 'ios' ? "System" : "Roboto",
   },
   boldText: {
     fontWeight: "bold",

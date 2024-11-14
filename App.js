@@ -6,7 +6,7 @@ import NetInfo from "@react-native-community/netinfo";
 import { Alert } from "react-native";
 import {Restart} from 'fiction-expo-restart';
 const App = () => {
-  //console.log(reloadAppAsync)
+  
   const unsubscribe = NetInfo.addEventListener((state) => {
     if (!state.isConnected) {
       Alert.alert(

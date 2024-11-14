@@ -1,16 +1,25 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 
 const Post = ({ item }) => {
   const navigation = useNavigation();
+  const route = useRoute();
   const imageUri = Array.isArray(item.image) ? item.image[0] : item.image;
 
+  const handlePostPress = () => {
+    const params = {
+      item,
+      previousScreen: route.name,
+      fromScreen: route.name,
+      username: item.user,
+    };
+
+    navigation.navigate("PostDetail", params);
+  };
+
   return (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("PostDetail", { item })}
-      style={styles.container}
-    >
+    <TouchableOpacity onPress={handlePostPress} style={styles.container}>
       <Image source={{ uri: imageUri }} style={styles.image} />
       <View style={styles.textContainer}>
         <Text style={styles.title} numberOfLines={2}>
