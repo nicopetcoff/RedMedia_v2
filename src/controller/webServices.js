@@ -16,7 +16,7 @@ const urlWebServices = {
   
   // Posts
   getPosts: urlApi + "api/posts",
-  postPost: urlApi + "api/posts/crear",
+  postPost: urlApi + "api/posts/create",
   
   // Mail
   passwordReset: urlApi + 'api/mail',

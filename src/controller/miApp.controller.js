@@ -150,62 +150,61 @@ export const updateProfileImage = async (imageUri, token) => {
 
 export const publishPost = async (postData, token) => {
   try {
-    let url = urlWebServices.postPost;
-    
+    console.log("FRONT POSTDATA", postData);
+
+    // La URL de los servicios web
+    const url = urlWebServices.postPost;
+
+    // Crear un objeto FormData para enviar los datos y archivos
     const formData = new FormData();
-    
-    // Agregar datos del post
+
+    // Agregar datos de texto del post
     formData.append('title', postData.title);
     formData.append('description', postData.description);
     formData.append('location', postData.location);
     formData.append('user', postData.user);
     formData.append('userAvatar', postData.userAvatar);
 
-    console.log('Post data added to formData:', {
-      title: postData.title,
-      description: postData.description,
-      location: postData.location,
-      user: postData.user,
-      userAvatar: postData.userAvatar
-    });
-
-    // Comprobar si 'media' está definido y es un array
+    // Agregar archivos multimedia (imágenes y videos)
     if (Array.isArray(postData.media) && postData.media.length > 0) {
-      // Agregar imágenes y videos
       postData.media.forEach((fileUri) => {
-        let localUri = fileUri;
-        let filename = localUri.split('/').pop();
-        let match = /\.(\w+)$/.exec(filename);
-        let fileExtension = match ? match[1] : ''; // Extensión del archivo
+        const localUri = fileUri;
+        const filename = localUri.split('/').pop();
+        const match = /\.(\w+)$/.exec(filename);
+        const fileExtension = match ? match[1].toLowerCase() : '';
         let type = '';
 
-        // Verificar si el archivo es imagen o video
+        // Verificar si el archivo es una imagen
         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
           type = `image/${fileExtension}`;
-        } else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) {
-          type = `video/${fileExtension}`;
-        } else {
-          type = fileExtension ? `application/octet-stream` : `application/octet-stream`;
+          // Cambiar 'images' a un nombre de campo único
+          formData.append(`images`, {
+            uri: localUri,
+            name: filename,
+            type: type,
+          });
         }
-
-        console.log(`File being added: ${filename}`);
-        console.log(`Type of file: ${type}`);
-        
-        formData.append(fileExtension.startsWith('image') ? 'images' : 'videos', {
-          uri: localUri,
-          name: filename,
-          type
-        });
+        // Verificar si el archivo es un video
+        else if (['mp4', 'mov', 'avi', 'mkv'].includes(fileExtension)) {
+          type = `video/${fileExtension}`;
+          // Cambiar 'videos' a un nombre de campo único
+          formData.append(`videos`, {
+            uri: localUri,
+            name: filename,
+            type: type,
+          });
+        }
       });
-
-      console.log('FormData object prepared with images and videos');
-    } else {
-      console.log('No media (images/videos) to add');
     }
 
-    console.log('FormData object prepared:', formData);
-    
-    // Realizar la solicitud fetch
+    // Verificar los datos enviados
+    console.log("Datos de FormData:");
+    for (let i = 0; i < formData._parts.length; i++) {
+      const part = formData._parts[i];
+      console.log(`Key: ${part[0]}, Value: ${JSON.stringify(part[1])}`);
+    }
+
+    // Realizar la solicitud fetch para enviar los datos al backend
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -215,10 +214,21 @@ export const publishPost = async (postData, token) => {
       body: formData
     });
 
-    // Verificar la respuesta del servidor
+    // Verificar si la respuesta es exitosa
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Error en la respuesta: ${response.status} - ${errorText}`);
+    } else if (!contentType || !contentType.includes("application/json")) {
+      const errorText = await response.text();
+      throw new Error(`Respuesta no es JSON: ${errorText}`);
+    }
+
+    // Analizar JSON si la respuesta es válida
     const responseData = await response.json();
     console.log('Server response:', responseData);
 
+    // Si la respuesta es exitosa, retornar el resultado
     if (response.ok) {
       return { 
         success: true, 
@@ -236,6 +246,7 @@ export const publishPost = async (postData, token) => {
     };
   }
 };
+
 
 
 
