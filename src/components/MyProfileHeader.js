@@ -26,10 +26,7 @@ const MyProfileHeader = ({ userData }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={
-          userData?.coverImage
-            ? { uri: userData.coverImage }
-            : require('../assets/imgs/portadaDefault.png')
+        source={ { uri: userData.coverImage }
         }
         style={styles.coverImage}
       />
@@ -37,9 +34,8 @@ const MyProfileHeader = ({ userData }) => {
       <View style={styles.avatarContainer}>
         <Image
           source={
-            userData?.avatar
-              ? { uri: userData.avatar }
-              : require('../assets/imgs/avatarDefault.jpg')
+            { uri: userData.avatar }
+              
           }
           style={styles.avatar}
         />
