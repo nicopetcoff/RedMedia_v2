@@ -65,7 +65,7 @@ export const signIn = async (userData) => {
 
     let data = await response.json();
     if (data.status === 400) {
-      throw new Error(data.message);
+      throw(data);
     }
     return data;
   } catch (error) {
@@ -87,9 +87,10 @@ export const sendPasswordResetEmail = async (email) => {
     });
 
     let data = await response.json();
-    if (data.status === 500) {
-      throw (data.message);
+    if (data.status === 404) {
+      throw (data);
     }
+    
     return data;
   } catch (error) {
     throw error;
