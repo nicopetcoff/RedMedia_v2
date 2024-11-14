@@ -136,11 +136,11 @@ const ProfileScreen = ({ route, navigation }) => {
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statText}>{user.followers || 0}</Text>
-            <Text style={styles.statLabel}>Seguidores</Text>
+            <Text style={styles.statLabel}>Followers</Text>
           </View>
           <View style={styles.statItem}>
             <Text style={styles.statText}>{user.following || 0}</Text>
-            <Text style={styles.statLabel}>Siguiendo</Text>
+            <Text style={styles.statLabel}>Following</Text>
           </View>
         </View>
       </View>
@@ -157,7 +157,7 @@ const ProfileScreen = ({ route, navigation }) => {
             isFollowing && styles.followingButtonText,
           ]}
         >
-          {isFollowing ? "Siguiendo" : "Seguir"}
+          {isFollowing ? "Unfollow" : "Follow"}
         </Text>
       </TouchableOpacity>
     </View>
